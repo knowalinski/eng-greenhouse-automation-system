@@ -8,6 +8,6 @@ System monitorowania parametrów w szklarni i jakiejś interakcji
 Wymyślić część hardware, ogarnąć interakcje esp32/esp8266 z serverem
 
 #### Hardware
-esp8266/esp32 jako kontroler czujki
-moduł oparty na esp32 jako sterownik interakcji
+esp8266/esp32 jako kontroler czujki </br>
+moduł oparty na esp32 jako sterownik interakcji </br>
 serwer
