@@ -11,3 +11,10 @@ Wymyślić część hardware, ogarnąć interakcje esp32/esp8266 z serverem
 esp8266/esp32 jako kontroler czujki </br>
 moduł oparty na esp32 jako sterownik interakcji </br>
 serwer
+
+#### Soft
+Aplikacja serwerowa z interfejsem webowym </br>
+firmware czujników </br>
+firmware sterownika interakcji
+
+#### Sruktura komunikacji
