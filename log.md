@@ -18,3 +18,15 @@ firmware czujników </br>
 firmware sterownika interakcji
 
 #### Sruktura komunikacji
+```mermaid
+graph TD;
+    czujka_1-->router;
+    czujka_2-->router;
+    czujka_n-->router;
+    sterownik-->router;
+    router-->server;
+    server-->web_interface;
+    web_interface-->server;
+    server-->router;
+    router-->sterownik;
+```
