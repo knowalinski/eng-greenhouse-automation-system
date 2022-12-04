@@ -13,4 +13,4 @@ def index():
 
 if __name__ == "__main__":
     # serve(app, host="0.0.0.0", threads=2)
-    app.run()
+    app.run(host="0.0.0.0")
