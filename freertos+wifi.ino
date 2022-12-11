@@ -1,37 +1,46 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-// #include <Adafruit_SSD1306.h>
 
-// const char* ssid = "toya525443076";
-// const char* password =  "05921029";
+
+// parametry sieci
 const char* ssid = "sensor_ap";
 const char* password = "sensor_ap";
-String dataFrame = "";
 
-// Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
-
+// deklaracje handlerów tasków
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 TaskHandle_t wifiTask;
 TaskHandle_t httpTask;
 TaskHandle_t taskxx;
-// HTTPClient http;
+
+
+// zmienne do testowania ramek danych
 int soilTSensor = 0;
 int soilHSensor = 0;
 int tSensor = 0;
 int hSensor = 0;
+String dataFrame = "";
 
+// deklaracja ledów do wizualizacji w taskach
 const int led_1 = 15;
 const int led_2 = 2;
+
 
 void setup() {
   Serial.begin(115200); 
   pinMode(led_1, OUTPUT);
   pinMode(led_2, OUTPUT);
 
-  xTaskCreatePinnedToCore(wifiTaskCode,"wifi task",10000,NULL,2,&wifiTask,0);                         
-  delay(500); 
+// stworzenie tasków wykonujących poszczególne funkcje
+  xTaskCreatePinnedToCore(wifiTaskCode,
+  "wifi task", // nazwa taska (to może być opisowe, nie jest to przetwarzane, słuzy do identyfikacji)
+  10000, // wielkość stosu zarezerwowana dla taska
+  NULL, // chuj wi
+  2, // priorytet taska
+  &wifiTask, // handler
+  0); // rdzeń na którym się to odpala           
+  delay(500); // te delaye teoretycznie zbędne, ale lepiej zostawić, żeby ta inicjalizacja przeszła bez problemów
 
   xTaskCreatePinnedToCore(httpHandlerTask,"http_task",10000,NULL,1,&httpTask,1);          
   delay(500); 
