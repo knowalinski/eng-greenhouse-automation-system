@@ -1,3 +1,5 @@
+# sprawdzanko, czy server w ogóle odpowiada na localhoscie
+
 import requests
 import time
 
