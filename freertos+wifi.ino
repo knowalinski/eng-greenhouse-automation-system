@@ -1,20 +1,26 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <Adafruit_SSD1306.h>
+// #include <Adafruit_SSD1306.h>
 
 // const char* ssid = "toya525443076";
 // const char* password =  "05921029";
 const char* ssid = "sensor_ap";
 const char* password = "sensor_ap";
+String dataFrame = "";
 
-
-Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
+// Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 TaskHandle_t wifiTask;
-TaskHandle_t oledTask;
+TaskHandle_t httpTask;
+TaskHandle_t taskxx;
+// HTTPClient http;
+int soilTSensor = 0;
+int soilHSensor = 0;
+int tSensor = 0;
+int hSensor = 0;
 
 const int led_1 = 15;
 const int led_2 = 2;
@@ -27,15 +33,12 @@ void setup() {
   xTaskCreatePinnedToCore(wifiTaskCode,"wifi task",10000,NULL,2,&wifiTask,0);                         
   delay(500); 
 
-  xTaskCreatePinnedToCore(oledTaskCode,"Task2",10000,NULL,1,&oledTask,1);          
+  xTaskCreatePinnedToCore(httpHandlerTask,"http_task",10000,NULL,1,&httpTask,1);          
   delay(500); 
 
-
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    while (1){yield();}}
-  }
-
+  xTaskCreatePinnedToCore(paramsHandlerTask, "paramsHandlerTask",10000,NULL,1,&taskxx,1);          
+  delay(500); 
+}
 
 void wifiTaskCode( void * parameter){
   Serial.print("wifi task is running on core ");
@@ -60,30 +63,35 @@ void wifiTaskCode( void * parameter){
     delay(5000);
   }
 }
-
-
-
-void oledTaskCode( void * parameter ){
-  Serial.print("oled task is running on core ");
-  Serial.println(xPortGetCoreID());
-
+void paramsHandlerTask( void * parameter) {
   for(;;){
-  digitalWrite(led_2, HIGH);
-  delay(1000);
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 10);
-  // Display static text
-  display.println("Hello, world!");
-  display.println(WiFi.status());
-  display.display(); 
-  
-  digitalWrite(led_2, LOW);
-  delay(1000);
+delay(1000);    
+        soilTSensor++;
+        soilHSensor++;
+        tSensor++;
+        hSensor++;
+        // dataFrame = soilTSensor + ":" + soilHSensor + ":" + tSensor + ":" + hSensor + ";";
+        dataFrame = "sT:{" + String(soilTSensor) + "}sH:{" + String(soilHSensor) + "}T:{" + String(tSensor)+"}H:{" + String(hSensor)+"}";
   }
 }
+void httpHandlerTask( void * parameter){
+  Serial.print("http_handler task is running on core ");
+  Serial.println(xPortGetCoreID());
+  
+  for(;;){
+  digitalWrite(led_2, HIGH);    
+    if(WiFi.status()==WL_CONNECTED){
+      HTTPClient http;
 
+      http.begin("http://192.168.1.137:5000");
+      http.addHeader("Content-Type", "text/plain");
+      http.POST(dataFrame);
+delay(1000);      
+    }
+      
+  digitalWrite(led_2, LOW);
+  delay(1000);}
+}
 
 
 void loop() {
