@@ -1,25 +1,26 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 
 // parametry sieci
-const char* ssid = "sensor_ap";
-const char* password = "sensor_ap";
+// const char* ssid = "sensor_ap";
+// const char* password = "sensor_ap";
+const char* ssid = "toya525443076";
+const char* password = "05921029";
 
 // deklaracje handlerów tasków
-TaskHandle_t Task1;
-TaskHandle_t Task2;
 TaskHandle_t wifiTask;
 TaskHandle_t httpTask;
 TaskHandle_t taskxx;
 
 
 // zmienne do testowania ramek danych
-int soilTSensor = 0;
-int soilHSensor = 0;
-int tSensor = 0;
-int hSensor = 0;
+int soilTemperatureSensorValue = 255;
+int soilMoistureSensorValue = 255;
+int airTemperatureSensorValue = 255;
+int airHumiditySensorValue = 255;
 String dataFrame = "";
 
 // deklaracja ledów do wizualizacji w taskach
@@ -31,21 +32,16 @@ void setup() {
   Serial.begin(115200); 
   pinMode(led_1, OUTPUT);
   pinMode(led_2, OUTPUT);
+  
 
 // stworzenie tasków wykonujących poszczególne funkcje
-  xTaskCreatePinnedToCore(wifiTaskCode,
-  "wifi task", // nazwa taska (to może być opisowe, nie jest to przetwarzane, słuzy do identyfikacji)
-  10000, // wielkość stosu zarezerwowana dla taska
-  NULL, // chuj wi
-  2, // priorytet taska
-  &wifiTask, // handler
-  0); // rdzeń na którym się to odpala           
+  xTaskCreatePinnedToCore(wifiTaskCode, "wifi task", 10000, NULL, 2, &wifiTask, 0);         
   delay(500); // te delaye teoretycznie zbędne, ale lepiej zostawić, żeby ta inicjalizacja przeszła bez problemów
 
   xTaskCreatePinnedToCore(httpHandlerTask,"http_task",10000,NULL,1,&httpTask,1);          
   delay(500); 
 
-  xTaskCreatePinnedToCore(paramsHandlerTask, "paramsHandlerTask",10000,NULL,1,&taskxx,1);          
+  xTaskCreatePinnedToCore(sensorDataCollector, "sensorDataCollector",10000,NULL,1,&taskxx,1);          
   delay(500); 
 }
 
@@ -72,36 +68,41 @@ void wifiTaskCode( void * parameter){
     delay(5000);
   }
 }
-void paramsHandlerTask( void * parameter) {
-  for(;;){
-delay(1000);    
-        soilTSensor++;
-        soilHSensor++;
-        tSensor++;
-        hSensor++;
-        // dataFrame = soilTSensor + ":" + soilHSensor + ":" + tSensor + ":" + hSensor + ";";
-        dataFrame = "sT:{" + String(soilTSensor) + "}sH:{" + String(soilHSensor) + "}T:{" + String(tSensor)+"}H:{" + String(hSensor)+"}";
-  }
-}
+
 void httpHandlerTask( void * parameter){
   Serial.print("http_handler task is running on core ");
   Serial.println(xPortGetCoreID());
   
   for(;;){
-  digitalWrite(led_2, HIGH);    
-    if(WiFi.status()==WL_CONNECTED){
-      HTTPClient http;
+    digitalWrite(led_2, HIGH);    
+      if(WiFi.status()==WL_CONNECTED){
+        HTTPClient http;
 
-      http.begin("http://192.168.1.137:5000");
-      http.addHeader("Content-Type", "text/plain");
-      http.POST(dataFrame);
-delay(1000);      
+        http.begin("https://servertest.knowalinski.repl.co");
+        http.addHeader("Content-Type", "text/plain");
+        http.POST(dataFrame);
+        delay(10000);      
     }
       
   digitalWrite(led_2, LOW);
   delay(1000);}
 }
 
+void sensorDataCollector(void * parameter){
+  StaticJsonDocument<256> doc;
+  for(;;){
+  // Q: ale w sumie na chuja mu wysyłać czas, skoro serwer sobie zaindeksuje wiadomość do aktualnego czasu
+  // A: jak będzie wysyłać zakolejkowane zaległe wiadomości to się może przydać, chociaż w sumie na chuja wysyłać zaległe, jak można je olać
+  // doc["time"] = 5; // TODO: dodać funkcje getTime() pobierającą czas z serwera
+  doc["soil_temperature"] = soilTemperatureSensorValue;
+  doc["soil_moisture"] = soilMoistureSensorValue;
+  doc["air_temperature"] = airTemperatureSensorValue;
+  doc["air_humidity"] = airHumiditySensorValue;
+  serializeJson(doc, dataFrame);
+  delay(10000);
+  }
+  
+}
 
 void loop() {
   
