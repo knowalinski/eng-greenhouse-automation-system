@@ -17,6 +17,7 @@ TaskHandle_t taskxx;
 
 
 // zmienne do testowania ramek danych
+int sensorId = 1;
 int soilTemperatureSensorValue = 255;
 int soilMoistureSensorValue = 255;
 int airTemperatureSensorValue = 255;
@@ -78,10 +79,11 @@ void httpHandlerTask( void * parameter){
       if(WiFi.status()==WL_CONNECTED){
         HTTPClient http;
 
-        http.begin("https://servertest.knowalinski.repl.co");
+        // http.begin("https://servertest.knowalinski.repl.co");
+        http.begin("http://10.5.101.7:5000/data_collector");
         http.addHeader("Content-Type", "text/plain");
         http.POST(dataFrame);
-        delay(10000);      
+        delay(30000);      
     }
       
   digitalWrite(led_2, LOW);
@@ -91,14 +93,19 @@ void httpHandlerTask( void * parameter){
 void sensorDataCollector(void * parameter){
   StaticJsonDocument<256> doc;
   for(;;){
+  dataFrame.clear();
+  doc.clear();
+  
   // Q: ale w sumie na chuja mu wysyłać czas, skoro serwer sobie zaindeksuje wiadomość do aktualnego czasu
   // A: jak będzie wysyłać zakolejkowane zaległe wiadomości to się może przydać, chociaż w sumie na chuja wysyłać zaległe, jak można je olać
   // doc["time"] = 5; // TODO: dodać funkcje getTime() pobierającą czas z serwera
+  doc["sensor_id"] = sensorId;
   doc["soil_temperature"] = soilTemperatureSensorValue;
   doc["soil_moisture"] = soilMoistureSensorValue;
   doc["air_temperature"] = airTemperatureSensorValue;
   doc["air_humidity"] = airHumiditySensorValue;
   serializeJson(doc, dataFrame);
+  Serial.println(dataFrame);
   delay(10000);
   }
   
