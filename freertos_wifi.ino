@@ -3,7 +3,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-
+// TODO: podział na funkcje z non-blocking delayem, i może wrzucenie pomiaru i przesyłu do jednego taska
 // parametry sieci
 // const char* ssid = "sensor_ap";
 // const char* password = "sensor_ap";
