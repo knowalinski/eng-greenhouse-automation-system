@@ -2,7 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import time
 import json
 import csv
-#TODO: dodać routing i threading 
+from datetime import datetime
+
+
+# TODO: dodać routing i threading
 
 # from waitress import serve
 
@@ -11,7 +14,8 @@ def parser(some_json):
     d = json.loads(some_json)
     # d_keys = list(d.keys())
     # d_values = list(d.values())
-    with open('test4.csv', 'a') as csvfile:
+    print(d["sensor_id"])
+    with open(f'dataSensor{d["sensor_id"]}.csv', 'a') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(list(d.values()))
 
@@ -29,7 +33,7 @@ def index():
     return "stary wstał"
 
 
-@app.route("/data_collector", methods=['POST'])
+@app.route("/data-collector", methods=['POST'])
 def collector():
     if request.method == "POST":
         try:
@@ -39,7 +43,20 @@ def collector():
             parser(request.data)
         except ValueError:
             print("Decoding failed")
+    print(request.data)
     return "test"
+
+
+@app.route("/get-datetime", methods=['GET'])
+def date_time():
+    now = datetime.now()
+    # date_list = [now.strftime("%d"),now.strftime("%m"),now.strftime("%Y")]
+    # time_list = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S") ]
+    date_list = [now.day,now.month,now.year]
+    time_list = [now.hour, now.minute, now.second]
+    date_time_dict = {"date": date_list, "time": time_list}
+    print(json.dumps(date_time_dict))
+    return json.dumps(date_time_dict)
 
 
 if __name__ == "__main__":
