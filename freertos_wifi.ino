@@ -13,16 +13,17 @@ const char* password = "05921029";
 // deklaracje handlerów tasków
 TaskHandle_t wifiTask;
 TaskHandle_t httpTask;
-TaskHandle_t taskxx;
+TaskHandle_t sensorTask;
 
 
 // zmienne do testowania ramek danych
 int sensorId = 1;
 int soilTemperatureSensorValue = 255;
 int soilMoistureSensorValue = 255;
-int airTemperatureSensorValue = 255;
+double airTemperatureSensorValue = 255;
 int airHumiditySensorValue = 255;
 String dataFrame = "";
+String getTime = "";
 
 // deklaracja ledów do wizualizacji w taskach
 const int led_1 = 15;
@@ -37,12 +38,12 @@ void setup() {
 
 // stworzenie tasków wykonujących poszczególne funkcje
   xTaskCreatePinnedToCore(wifiTaskCode, "wifi task", 10000, NULL, 2, &wifiTask, 0);         
-  delay(500); // te delaye teoretycznie zbędne, ale lepiej zostawić, żeby ta inicjalizacja przeszła bez problemów
+  delay(500);
 
   xTaskCreatePinnedToCore(httpHandlerTask,"http_task",10000,NULL,1,&httpTask,1);          
   delay(500); 
 
-  xTaskCreatePinnedToCore(sensorDataCollector, "sensorDataCollector",10000,NULL,1,&taskxx,1);          
+  xTaskCreatePinnedToCore(sensorDataCollector, "sensorDataCollector",10000,NULL,1,&sensorTask,1);          
   delay(500); 
 }
 
@@ -80,33 +81,52 @@ void httpHandlerTask( void * parameter){
         HTTPClient http;
 
         // http.begin("https://servertest.knowalinski.repl.co");
-        http.begin("http://10.5.101.7:5000/data_collector");
+        http.begin("http://10.5.101.7:5000/data-collector");
         http.addHeader("Content-Type", "text/plain");
         http.POST(dataFrame);
-        delay(30000);      
+        http.end();
+        delay(10000);      
     }
       
   digitalWrite(led_2, LOW);
-  delay(1000);}
+  delay(100);}
 }
 
 void sensorDataCollector(void * parameter){
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<1024> doc;
+  StaticJsonDocument<256> docTime;
   for(;;){
   dataFrame.clear();
   doc.clear();
+  getTime.clear();
+  HTTPClient http;
+  http.begin("http://10.5.101.7:5000/get-datetime");
+  http.GET();
+  getTime = http.getString();
   
-  // Q: ale w sumie na chuja mu wysyłać czas, skoro serwer sobie zaindeksuje wiadomość do aktualnego czasu
-  // A: jak będzie wysyłać zakolejkowane zaległe wiadomości to się może przydać, chociaż w sumie na chuja wysyłać zaległe, jak można je olać
-  // doc["time"] = 5; // TODO: dodać funkcje getTime() pobierającą czas z serwera
-  doc["sensor_id"] = sensorId;
-  doc["soil_temperature"] = soilTemperatureSensorValue;
+
+  deserializeJson(docTime, getTime);
+  Serial.println(getTime);
+
+  airTemperatureSensorValue = random(2200,2500);
+  doc["sensor_id"] = random(1,5);
+  // doc["soil_temperature"] = soilTemperatureSensorValue;
+  doc["soil_temperature"] = airTemperatureSensorValue/100;
   doc["soil_moisture"] = soilMoistureSensorValue;
-  doc["air_temperature"] = airTemperatureSensorValue;
+  doc["air_temperature"] = String(airTemperatureSensorValue/100);
   doc["air_humidity"] = airHumiditySensorValue;
+  doc["date"] = docTime["date"];
+  doc["time"] = docTime["time"];
+  // doc["sensor_id"] = random(1,5);
+  // doc["soil_temperature"] = random(200,220)/10;
+  // doc["soil_moisture"] = random(90,95);
+  // doc["air_temperature"] = random(200,230)/10;
+  // doc["air_humidity"] = random(70,75);
   serializeJson(doc, dataFrame);
   Serial.println(dataFrame);
-  delay(10000);
+  
+  http.end();
+  delay(9000);
   }
   
 }
