@@ -3,7 +3,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-// TODO: podział na funkcje z non-blocking delayem, i może wrzucenie pomiaru i przesyłu do jednego taska
+
 // parametry sieci
 // const char* ssid = "sensor_ap";
 // const char* password = "sensor_ap";
@@ -82,6 +82,7 @@ void httpHandlerTask( void * parameter){
 
         // http.begin("https://servertest.knowalinski.repl.co");
         http.begin("http://10.5.101.7:5000/data-collector");
+        // http.begin("https://servertest.knowalinski.repl.co/data-collector");
         http.addHeader("Content-Type", "text/plain");
         http.POST(dataFrame);
         http.end();
@@ -98,34 +99,36 @@ void sensorDataCollector(void * parameter){
   for(;;){
   dataFrame.clear();
   doc.clear();
+  docTime.clear();
   getTime.clear();
   HTTPClient http;
   http.begin("http://10.5.101.7:5000/get-datetime");
+  // http.begin("https://servertest.knowalinski.repl.co/get-datetime");
   http.GET();
   getTime = http.getString();
-  
+  http.end();
 
   deserializeJson(docTime, getTime);
   Serial.println(getTime);
-
-  airTemperatureSensorValue = random(2200,2500);
-  doc["sensor_id"] = random(1,5);
-  // doc["soil_temperature"] = soilTemperatureSensorValue;
-  doc["soil_temperature"] = airTemperatureSensorValue/100;
-  doc["soil_moisture"] = soilMoistureSensorValue;
-  doc["air_temperature"] = String(airTemperatureSensorValue/100);
-  doc["air_humidity"] = airHumiditySensorValue;
-  doc["date"] = docTime["date"];
-  doc["time"] = docTime["time"];
-  // doc["sensor_id"] = random(1,5);
-  // doc["soil_temperature"] = random(200,220)/10;
-  // doc["soil_moisture"] = random(90,95);
-  // doc["air_temperature"] = random(200,230)/10;
-  // doc["air_humidity"] = random(70,75);
-  serializeJson(doc, dataFrame);
-  Serial.println(dataFrame);
+  if (docTime["date"].isNull() || docTime["time"].isNull()){
+    airTemperatureSensorValue = random(2200,2500);
+    doc["sensor_id"] = random(1,5);
+    // doc["soil_temperature"] = soilTemperatureSensorValue;
+    doc["soil_temperature"] = airTemperatureSensorValue/100;
+    doc["soil_moisture"] = soilMoistureSensorValue;
+    doc["air_temperature"] = (airTemperatureSensorValue/100);
+    doc["air_humidity"] = airHumiditySensorValue;
+    doc["date"] = docTime["date"];
+    doc["time"] = docTime["time"];
+    // doc["sensor_id"] = random(1,5);
+    // doc["soil_temperature"] = random(200,220)/10;
+    // doc["soil_moisture"] = random(90,95);
+    // doc["air_temperature"] = random(200,230)/10;
+    // doc["air_humidity"] = random(70,75);
+    serializeJson(doc, dataFrame);
+    Serial.println(dataFrame);}
   
-  http.end();
+  
   delay(9000);
   }
   
