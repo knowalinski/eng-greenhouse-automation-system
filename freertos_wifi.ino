@@ -82,6 +82,7 @@ void httpHandlerTask( void * parameter){
 
         // http.begin("https://servertest.knowalinski.repl.co");
         http.begin("http://10.5.101.7:5000/data-collector");
+        
         // http.begin("https://servertest.knowalinski.repl.co/data-collector");
         http.addHeader("Content-Type", "text/plain");
         http.POST(dataFrame);
@@ -110,7 +111,7 @@ void sensorDataCollector(void * parameter){
 
   deserializeJson(docTime, getTime);
   Serial.println(getTime);
-  if (docTime["date"].isNull() || docTime["time"].isNull()){
+  if (!docTime["date"].isNull() || !docTime["time"].isNull()){
     airTemperatureSensorValue = random(2200,2500);
     doc["sensor_id"] = random(1,5);
     // doc["soil_temperature"] = soilTemperatureSensorValue;
