@@ -15,7 +15,7 @@ def parser(some_json):
     # d_keys = list(d.keys())
     # d_values = list(d.values())
     print(d["sensor_id"])
-    with open(f'dataSensor{d["sensor_id"]}.csv', 'a') as csvfile:
+    with open(f'dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(list(d.values()))
 
@@ -52,11 +52,12 @@ def date_time():
     now = datetime.now()
     # date_list = [now.strftime("%d"),now.strftime("%m"),now.strftime("%Y")]
     # time_list = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S") ]
-    date_list = [now.day,now.month,now.year]
+    date_list = [now.day, now.month, now.year]
     time_list = [now.hour, now.minute, now.second]
     date_time_dict = {"date": date_list, "time": time_list}
     print(json.dumps(date_time_dict))
     return json.dumps(date_time_dict)
+
 
 
 if __name__ == "__main__":
