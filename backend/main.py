@@ -5,34 +5,29 @@ import csv
 from datetime import datetime
 # from waitress import serve
 
-# TODO: dodać routing i threading
-
-
-
 
 def parser(some_json):
     d = json.loads(some_json)
-    # d_keys = list(d.keys())
-    # d_values = list(d.values())
     print(d["sensor_id"])
     with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(list(d.values()))
-
-    #     # writer.writerows(some_json)
-    # print(*r_data.keys(), *r_data.values())
 
 
 
 app = Flask(__name__)
 
 
+# TODO: dodać routy dla dashboardu i plottera
+
+
+# ! route testowy - później zostanie usunięty
 @app.route("/", methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
     
 
-
+# * route dodbierający ramki danych z esp32
 @app.route("/data-collector", methods=['POST'])
 def collector():
     if request.method == "POST":
@@ -47,11 +42,11 @@ def collector():
     return "test"
 
 
+# * route publikujący czas - pozwala na zrezygnowanie z fizycznego RTC w ESP32
+# * (czas jest potrzebny jako identyfikator próbek w ramkach danych z czujników)
 @app.route("/get-datetime", methods=['GET'])
 def date_time():
     now = datetime.now()
-    # date_list = [now.strftime("%d"),now.strftime("%m"),now.strftime("%Y")]
-    # time_list = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S") ]
     date_list = [now.day, now.month, now.year]
     time_list = [now.hour, now.minute, now.second]
     date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
@@ -59,11 +54,16 @@ def date_time():
     print(json.dumps(date_time_dict))
     return json.dumps(date_time_dict)
 
+
+# * route publikujący set requestowanych danych
+# TODO: określić sposób requestowania i forme przesyłania informacji do gui
 @app.route("/data-publisher", methods=['POST, GET'])
 def data_publisher():
     return "data"
 
-@app.route("/sensor-publsher", methods=['POST'])
+# * route publikujący listę dostępnych w systemie czujników wraz z ich stanami
+# TODO: określić kryterium stanu czujnika (aktywny/nieaktywny)
+@app.route("/sensor-publisher", methods=['POST','GET'])
 def sensor_publisher():
     return "sensor id list"
 
