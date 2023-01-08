@@ -63,6 +63,6 @@ def get_one_day_data(data_code, sensor_id, date):
 lab = [3, 3]
 # get_data(*lab)
 # plot_data(*lab)
-date = [5,1,2023]
-get_one_day_data(*lab, str(date))
+date = "08:01:2023"
+get_one_day_data(*lab, date)
 # data_parser(3)
