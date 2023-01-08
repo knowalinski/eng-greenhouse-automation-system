@@ -32,13 +32,11 @@ def index():
 def collector():
     if request.method == "POST":
         try:
-            # print(request.data)
-            # print(json.loads(request.data.decode("utf-8")))
-            # print(type(json.loads(request.data)))
             parser(request.data)
         except ValueError:
             print("Decoding failed")
-    print(request.data)
+    # print(request.data)
+    print("data collected")
     return "test"
 
 
@@ -51,7 +49,7 @@ def date_time():
     time_list = [now.hour, now.minute, now.second]
     date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
 
-    print(json.dumps(date_time_dict))
+    # print(json.dumps(date_time_dict))
     return json.dumps(date_time_dict)
 
 
