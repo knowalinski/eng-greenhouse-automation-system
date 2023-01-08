@@ -3,11 +3,11 @@ import time
 import json
 import csv
 from datetime import datetime
-
+# from waitress import serve
 
 # TODO: dodać routing i threading
 
-# from waitress import serve
+
 
 
 def parser(some_json):
@@ -23,8 +23,7 @@ def parser(some_json):
     # print(*r_data.keys(), *r_data.values())
 
 
-# baza części serverowej, póki co tylko odbiera POSTa
-# TODO: json parser
+
 app = Flask(__name__)
 
 
