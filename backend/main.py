@@ -15,7 +15,7 @@ def parser(some_json):
     # d_keys = list(d.keys())
     # d_values = list(d.values())
     print(d["sensor_id"])
-    with open(f'dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
+    with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(list(d.values()))
 
@@ -54,9 +54,19 @@ def date_time():
     # time_list = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S") ]
     date_list = [now.day, now.month, now.year]
     time_list = [now.hour, now.minute, now.second]
-    date_time_dict = {"date": date_list, "time": time_list}
+    date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
+
     print(json.dumps(date_time_dict))
     return json.dumps(date_time_dict)
+
+@app.route("/data-publisher", methods=['POST, GET'])
+def data_publisher():
+    return "data"
+
+@app.route("/sensor-publsher", methods=['POST'])
+def sensor_publisher():
+    return "sensor id list"
+
 
 
 
