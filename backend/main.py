@@ -4,7 +4,7 @@ import json
 import csv
 from datetime import datetime
 # from waitress import serve
-
+html = '    <div class = "sensor"><label for = "sensor_id">box from html</label><br><label for = "">Air temperature:</label><br><label for = "">Air humidity:</label><br><label for = "">Soil temperature:</label><br><label for = "">Soil humidity:</label><br></div>'
 
 def parser(some_json):
     d = json.loads(some_json)
@@ -13,6 +13,11 @@ def parser(some_json):
         writer = csv.writer(csvfile)
         writer.writerow(list(d.values()))
 
+def html_generator():
+    with open('backend/templates/index.html', 'w') as f:
+        f.write(html)
+        f.close()
+        
 
 
 app = Flask(__name__)
@@ -71,4 +76,5 @@ def sensor_publisher():
 if __name__ == "__main__":
     # serve(app, host="0.0.0.0", threads=2)
     # host 0.0.0.0 po to, żeby odpaliło się w sieci lokalnej a nie tylko na localhoscie
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
+    html_generator()
