@@ -4,7 +4,7 @@ import json
 import csv
 from datetime import datetime
 # from waitress import serve
-html = '    <div class = "sensor"><label for = "sensor_id">box from html</label><br><label for = "">Air temperature:</label><br><label for = "">Air humidity:</label><br><label for = "">Soil temperature:</label><br><label for = "">Soil humidity:</label><br></div>'
+html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
 
 def parser(some_json):
     d = json.loads(some_json)
@@ -14,7 +14,7 @@ def parser(some_json):
         writer.writerow(list(d.values()))
 
 def html_generator():
-    with open('backend/templates/index.html', 'w') as f:
+    with open('backend/templates/assets/ending.html', 'w') as f:
         f.write(html)
         f.close()
         
