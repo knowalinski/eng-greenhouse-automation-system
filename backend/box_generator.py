@@ -1,8 +1,8 @@
-input_file = {1:[1,[2,3,4,5]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]]}
+input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
 
 class box_generator:
-    def __init__(self, input_fil):
-        self.input_file = input_fil
+    def __init__(self, input_dict):
+        self.input_file = input_dict
         self.state = 0
         self.sensor_data = []
         self.sensor_id = 0
@@ -51,22 +51,10 @@ class box_generator:
         return opener+self.html+'</body>\n</html>'
 
     def html_dump(self):
-            with open('backend/templates/assets/index.html', 'w') as f:
+            with open('backend/templates/index.html', 'w') as f:
                 f.write(self.generate())
                 f.close()
 
 
-    
 
-print(box_generator(input_file).html_dump())
-
-
-# def generate_box(state, sensor_id, sensor_data):
-#     if state == 1:
-#         state_class = "activeSensor"
-#     else:
-#         state_class = "inactiveSensor"
-
-#     html_class = f'<div class = "{state_class}><br>\n'
-#     html_sensor_id = f'<label>sensor_{sensor_id}</label>'
-#     html_sensor_data = '<br><label>Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'.format(*sensor_data)
+box_generator(input_file).html_dump()

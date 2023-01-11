@@ -3,6 +3,7 @@ import time
 import json
 import csv
 from datetime import datetime
+from data_operator import Data_operator
 # from waitress import serve
 html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
 
@@ -37,10 +38,11 @@ def index():
 def collector():
     if request.method == "POST":
         try:
-            parser(request.data)
+            # parser(request.data)
+            Data_operator(request.data).csv_dump()
         except ValueError:
             print("Decoding failed")
-    # print(request.data)
+    print(request.data)
     print("data collected")
     return "test"
 
@@ -76,5 +78,4 @@ def sensor_publisher():
 if __name__ == "__main__":
     # serve(app, host="0.0.0.0", threads=2)
     # host 0.0.0.0 po to, żeby odpaliło się w sieci lokalnej a nie tylko na localhoscie
-    # app.run(host="0.0.0.0")
-    html_generator()
+    app.run(host="0.0.0.0")

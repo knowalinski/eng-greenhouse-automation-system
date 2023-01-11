@@ -1,7 +1,16 @@
-.sensor {
+.inactiveSensor {
   background-color: tomato;
   color: white;
   border: 2px solid black;
   margin: 20px;
   padding: 20px;
+  text-align: center;
+}
+.activeSensor {
+  background-color: green;
+  color: white;
+  border: 2px solid black;
+  margin: 20px;
+  padding: 20px;
+  text-align: center;
 }
