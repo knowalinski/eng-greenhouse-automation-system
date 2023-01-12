@@ -3,21 +3,21 @@ import time
 import json
 import csv
 from datetime import datetime
-from data_operator import Data_operator
+from data_operator import DataOperator, TimeOperator
 # from waitress import serve
 html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
 
-def parser(some_json):
-    d = json.loads(some_json)
-    print(d["sensor_id"])
-    with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(list(d.values()))
+# def parser(some_json):
+#     d = json.loads(some_json)
+#     print(d["sensor_id"])
+#     with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
+#         writer = csv.writer(csvfile)
+#         writer.writerow(list(d.values()))
 
-def html_generator():
-    with open('backend/templates/assets/ending.html', 'w') as f:
-        f.write(html)
-        f.close()
+# def html_generator():
+#     with open('backend/templates/assets/ending.html', 'w') as f:
+#         f.write(html)
+#         f.close()
         
 
 
@@ -39,7 +39,7 @@ def collector():
     if request.method == "POST":
         try:
             # parser(request.data)
-            Data_operator(request.data).csv_dump()
+            DataOperator(request.data).csv_dump()
         except ValueError:
             print("Decoding failed")
     print(request.data)
@@ -57,7 +57,8 @@ def date_time():
     date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
 
     # print(json.dumps(date_time_dict))
-    return json.dumps(date_time_dict)
+    # return json.dumps(date_time_dict)
+    return(TimeOperator().get_datetime())
 
 
 # * route publikujący set requestowanych danych
