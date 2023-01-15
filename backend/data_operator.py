@@ -40,13 +40,23 @@ class DataOperator:
 class TimeOperator:
     def __init__(self):
         self.now = ''
+        self.date_list = []
+        self.time_list = []
     def get_datetime(self):
-            self.now = datetime.now()
-            date_list = [self.now.day, self.now.month, self.now.year]
-            time_list = [self.now.hour, self.now.minute, self.now.second]
-            return {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
-        
+        self.now = datetime.now()
+        date_list = [self.now.day, self.now.month, self.now.year]
+        time_list = [self.now.hour, self.now.minute, self.now.second]
+        return date_list, time_list
+    
+    def send_datetime(self):
+        return {"date": "{:02d}:{:02d}:{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
+
+    
     def compare_time(self, timestamp):
+        # TODO: get datetime string from timestamp
+        
+        datetime_object = datetime.strptime(timestamp, '%d:%m:%y %H:%M:%S')
+        deltatime = datetime.now() - datetime_object
+        return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
         datetime_str = '09:12:22 13:55:26'
 
- 

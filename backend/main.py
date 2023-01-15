@@ -38,6 +38,7 @@ def index():
 def collector():
     if request.method == "POST":
         try:
+            # TODO: dodać zapisywanie ostatniej wartości dla każdego czujnika do słownika.
             # parser(request.data)
             DataOperator(request.data).csv_dump()
         except ValueError:
@@ -51,14 +52,14 @@ def collector():
 # * (czas jest potrzebny jako identyfikator próbek w ramkach danych z czujników)
 @app.route("/get-datetime", methods=['GET'])
 def date_time():
-    now = datetime.now()
-    date_list = [now.day, now.month, now.year]
-    time_list = [now.hour, now.minute, now.second]
-    date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
+    # now = datetime.now()
+    # date_list = [now.day, now.month, now.year]
+    # time_list = [now.hour, now.minute, now.second]
+    # date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
 
     # print(json.dumps(date_time_dict))
     # return json.dumps(date_time_dict)
-    return(TimeOperator().get_datetime())
+    return(TimeOperator().send_datetime())
 
 
 # * route publikujący set requestowanych danych
