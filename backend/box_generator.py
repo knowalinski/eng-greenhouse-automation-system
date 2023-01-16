@@ -1,6 +1,6 @@
 input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
 
-class box_generator:
+class BoxGenerator:
     def __init__(self, input_dict):
         self.input_file = input_dict
         self.state = 0
@@ -57,4 +57,4 @@ class box_generator:
 
 
 
-box_generator(input_file).html_dump()
+# BoxGenerator(input_file).html_dump()

@@ -2,10 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import time
 import json
 import csv
+import random
 from datetime import datetime
+from box_generator import BoxGenerator
 from data_operator import DataOperator, TimeOperator
 # from waitress import serve
-html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
+# html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
 
 # def parser(some_json):
 #     d = json.loads(some_json)
@@ -22,7 +24,7 @@ html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</labe
 
 
 app = Flask(__name__)
-
+input_dict = {}
 
 # TODO: dodać routy dla dashboardu i plottera
 
@@ -38,13 +40,18 @@ def index():
 def collector():
     if request.method == "POST":
         try:
+            # TODO: dodać konwersje typu danych w generatorze wyjściowego słownika
             # TODO: dodać zapisywanie ostatniej wartości dla każdego czujnika do słownika.
-            # parser(request.data)
-            DataOperator(request.data).csv_dump()
+            data = DataOperator(request.data)
+            # data.csv_dump()
+            input_dict[data.get_sensorid()] = [1, [*data.get_values()]]
+            BoxGenerator(input_dict).html_dump()
+            print (input_dict)
+            print("data collected")
         except ValueError:
             print("Decoding failed")
-    print(request.data)
-    print("data collected")
+    print(type(request.data))
+    
     return "test"
 
 
@@ -52,27 +59,30 @@ def collector():
 # * (czas jest potrzebny jako identyfikator próbek w ramkach danych z czujników)
 @app.route("/get-datetime", methods=['GET'])
 def date_time():
-    # now = datetime.now()
-    # date_list = [now.day, now.month, now.year]
-    # time_list = [now.hour, now.minute, now.second]
-    # date_time_dict = {"date": "{:02d}:{:02d}:{}".format(*date_list), "time": "{:02d}:{:02d}:{:02d}".format(*time_list)}
-
-    # print(json.dumps(date_time_dict))
-    # return json.dumps(date_time_dict)
     return(TimeOperator().send_datetime())
 
 
 # * route publikujący set requestowanych danych
-# TODO: określić sposób requestowania i forme przesyłania informacji do gui
 @app.route("/data-publisher", methods=['POST, GET'])
 def data_publisher():
     return "data"
 
 # * route publikujący listę dostępnych w systemie czujników wraz z ich stanami
 # TODO: określić kryterium stanu czujnika (aktywny/nieaktywny)
+# !!!
 @app.route("/sensor-publisher", methods=['POST','GET'])
 def sensor_publisher():
-    return "sensor id list"
+#     input_dict = {}
+#     BoxGenerator(input_dict).html_dump()
+#     # input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
+#     for i in range(1, random.randint(2,10)):
+#         input_dict[i] = [random.randint(0,1),[2,3,4,5]]
+#     print(input_dict)
+    # ! dodać generowanie rzeczywistego output_dict
+    # DataOperator.generate_output
+    print(input_dict)
+    # BoxGenerator(input_dict).html_dump()
+    return render_template('index.html')
 
 
 
@@ -80,4 +90,5 @@ def sensor_publisher():
 if __name__ == "__main__":
     # serve(app, host="0.0.0.0", threads=2)
     # host 0.0.0.0 po to, żeby odpaliło się w sieci lokalnej a nie tylko na localhoscie
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(host="0.0.0.0")
