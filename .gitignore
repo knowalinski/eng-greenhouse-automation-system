@@ -1,6 +1,7 @@
 *.csv
 *.exe
 *.ipynb
+index.html
 settings.json
 ### Python ###
 # Byte-compiled / optimized / DLL files
