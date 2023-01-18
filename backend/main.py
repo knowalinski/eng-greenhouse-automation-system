@@ -27,7 +27,7 @@ def collector():
     if request.method == "POST":
         try:
             data = DataOperator(request.data)
-            # data.csv_dump()
+            data.csv_dump()
             input_dict[data.get_sensorid()] = [1, [*data.get_values()]]
             BoxGenerator(input_dict).html_dump()
             print (input_dict)

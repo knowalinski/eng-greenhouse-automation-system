@@ -53,13 +53,13 @@ class TimeOperator:
         return date_list, time_list
     
     def send_datetime(self):
-        return {"date": "{:02d}:{:02d}:{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
+        return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
 
     
     def compare_time(self, timestamp):
         # TODO: get datetime string from timestamp
         
-        datetime_object = datetime.strptime(timestamp, '%d:%m:%y %H:%M:%S')
+        datetime_object = datetime.strptime(timestamp, '%d-%m-%y %H:%M:%S')
         deltatime = datetime.now() - datetime_object
         return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
 
