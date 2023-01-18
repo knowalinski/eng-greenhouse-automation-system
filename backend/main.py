@@ -6,21 +6,7 @@ import random
 from datetime import datetime
 from box_generator import BoxGenerator
 from data_operator import DataOperator, TimeOperator
-# from waitress import serve
-# html = '    <div class = "sensor">\n<label for = "sensor_id">box from html</label>\n<br><label for = "">Air temperature:</label><br>\n<label for = "">Air humidity:</label><br>\n<label for = "">Soil temperature:</label><br>\n<label for = "">Soil humidity:</label><br>\n</div>'
-
-# def parser(some_json):
-#     d = json.loads(some_json)
-#     print(d["sensor_id"])
-#     with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(list(d.values()))
-
-# def html_generator():
-#     with open('backend/templates/assets/ending.html', 'w') as f:
-#         f.write(html)
-#         f.close()
-        
+# from waitress import serve       
 
 
 app = Flask(__name__)
@@ -40,8 +26,6 @@ def index():
 def collector():
     if request.method == "POST":
         try:
-            # TODO: dodać konwersje typu danych w generatorze wyjściowego słownika
-            # TODO: dodać zapisywanie ostatniej wartości dla każdego czujnika do słownika.
             data = DataOperator(request.data)
             # data.csv_dump()
             input_dict[data.get_sensorid()] = [1, [*data.get_values()]]
@@ -72,16 +56,16 @@ def data_publisher():
 # !!!
 @app.route("/sensor-publisher", methods=['POST','GET'])
 def sensor_publisher():
-#     input_dict = {}
-#     BoxGenerator(input_dict).html_dump()
-#     # input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
-#     for i in range(1, random.randint(2,10)):
-#         input_dict[i] = [random.randint(0,1),[2,3,4,5]]
+# #     input_dict = {}
+# #     BoxGenerator(input_dict).html_dump()
+# #     # input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
+# #     for i in range(1, random.randint(2,10)):
+# #         input_dict[i] = [random.randint(0,1),[2,3,4,5]]
+# #     print(input_dict)
+#     # ! dodać generowanie rzeczywistego output_dict
+#     # DataOperator.generate_output
 #     print(input_dict)
-    # ! dodać generowanie rzeczywistego output_dict
-    # DataOperator.generate_output
-    print(input_dict)
-    # BoxGenerator(input_dict).html_dump()
+#     # BoxGenerator(input_dict).html_dump()
     return render_template('index.html')
 
 
