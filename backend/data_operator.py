@@ -38,28 +38,82 @@ class DataOperator:
             writer.writerow(list(d.values()))
 
     
-# dict = {"sensor_id":3,"soil_temperature":22.97,"soil_moisture":255,"air_temperature":22.97,"air_humidity":255,"date":"11:01:2023","time":"20:31:17"}
-# dataOperator(dict).generate_output()
-# DataOperator(dict).csv_dump()
+
 class TimeOperator:
     def __init__(self):
-        self.now = ''
-        self.date_list = []
-        self.time_list = []
+        pass
+
     def get_datetime(self):
-        self.now = datetime.now()
-        date_list = [self.now.day, self.now.month, self.now.year]
-        time_list = [self.now.hour, self.now.minute, self.now.second]
+        now = datetime.now()
+        date_list = [now.day, now.month, now.year]
+        time_list = [now.hour, now.minute, now.second]
         return date_list, time_list
     
     def send_datetime(self):
         return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
 
-    
     def compare_time(self, timestamp):
         # TODO: get datetime string from timestamp
-        
         datetime_object = datetime.strptime(timestamp, '%d-%m-%y %H:%M:%S')
         deltatime = datetime.now() - datetime_object
         return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
+
+    def 
+
+
+class BoxGenerator(TimeOperator):
+    def __init__(self, input_dict):
+        super().__init__()
+        self.input_file = input_dict
+        self.sensor_data = []
+        self.sensor_id = 0
+        self.html = ''
+        self.state = ''
+    def check_state(self, sensor_state):
+        if sensor_state == 1:
+            self.state = "activeSensor"
+        else:
+            self.state = "inactiveSensor"
+    
+    def state_class(self):
+        return f'<div class = "{self.state}"><br>\n'
+
+    def sensorID_label(self):
+        return f'<label>sensor_{self.sensor_id}</label>\n'
+
+    def data_labels(self):
+        return '<br><label>Air temperature: {}</label><br>\n' \
+            '<label>Air humidity: {}</label><br>\n' \
+                '<label>Soil temperature: {}</label><br>\n' \
+                    '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
+
+    def merge(self):
+        self.check_state()
+        a = self.state_class()
+        b = self.sensorID_label()
+        c = self.data_labels()
+        return a+b+c
+
+    def replicate(self):
+        for key in self.input_file:
+            self.sensor_id = key
+            self.state = self.input_file[key][0]
+            self.sensor_data = self.input_file[key][1]
+            self.html+=self.merge()
+    
+    def generate(self):
+        opener ='<!DOCTYPE html>\n<head>'\
+                '\n<title>DASHBOARD</title>'\
+                '\n<link rel="stylesheet" href="{{url_for(\'static\', filename=\'css/style.css\')}}">'\
+                '\n</head>'\
+                '\n<body>'\
+                '\n<h2>DASHBOARD <span id="dash-board"></span></h2>'\
+                '\n<button id = goto-plotting>plotting</button>\n'
+        self.replicate()
+        return opener+self.html+'</body>\n</html>'
+
+    def html_dump(self):
+            with open('backend/templates/index.html', 'w') as f:
+                f.write(self.generate())
+                f.close()
 

@@ -1,5 +1,3 @@
-input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
-
 class BoxGenerator:
     def __init__(self, input_dict):
         self.input_file = input_dict
@@ -32,7 +30,6 @@ class BoxGenerator:
         return a+b+c
 
     def replicate(self):
-        # self.html
         for key in self.input_file:
             self.sensor_id = key
             self.state = self.input_file[key][0]
@@ -55,6 +52,3 @@ class BoxGenerator:
                 f.write(self.generate())
                 f.close()
 
-
-
-# BoxGenerator(input_file).html_dump()
