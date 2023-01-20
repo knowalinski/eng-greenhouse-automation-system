@@ -58,7 +58,6 @@ class TimeOperator:
         deltatime = datetime.now() - datetime_object
         return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
 
-    def 
 
 
 class BoxGenerator(TimeOperator):
