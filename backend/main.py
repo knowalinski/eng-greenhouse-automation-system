@@ -5,13 +5,12 @@ import csv
 import random
 from datetime import datetime
 # from box_generator import BoxGenerator
-from data_operator import DataOperator, TimeOperator, BoxGenerator
+from data_operator import DataOperator, TimeOperator, BoxGenerator, OutputGenerator
 # from waitress import serve       
-
 
 app = Flask(__name__)
 input_dict = {}
-
+output_generator = OutputGenerator()
 # TODO: dodać routy dla dashboardu i plottera
 '''zrobiene: mało
 do zrobienia: 
@@ -39,11 +38,13 @@ def collector():
             
             data = DataOperator(request.data)
             data.csv_dump()
-            input_dict[data.get_sensorid()] = [1, [*data.get_values()]]
-            generator = BoxGenerator(input_dict)
+            # input_dict[data.get_sensorid()] = [1, [*data.get_values()]]
+            output_generator.update_records(data.sensor_id, data.values, data.timestamp)
+            output_generator.update_states()
+            generator = BoxGenerator(output_generator.return_output())
             generator.html_dump()
             # BoxGenerator(input_dict).html_dump()
-            print (input_dict)
+            print(output_generator.latest_records)
             print("data collected")
         except ValueError:
             print("Decoding failed")
@@ -69,16 +70,6 @@ def data_publisher():
 # !!!
 @app.route("/sensor-publisher", methods=['POST','GET'])
 def sensor_publisher():
-# #     input_dict = {}
-# #     BoxGenerator(input_dict).html_dump()
-# #     # input_file = {1:[1,[2,3,4,5],[]], 2:[1,[2,3,4,5]], 3:[1,[2,3,4,5]], 4:[1,[2,3,4,5]], 5:[1,[2,3,4,5]], 6:[1,[2,3,4,5]], 7:[1,[2,3,4,5]]}
-# #     for i in range(1, random.randint(2,10)):
-# #         input_dict[i] = [random.randint(0,1),[2,3,4,5]]
-# #     print(input_dict)
-#     # ! dodać generowanie rzeczywistego output_dict
-#     # DataOperator.generate_output
-#     print(input_dict)
-#     # BoxGenerator(input_dict).html_dump()
     return render_template('index.html')
 
 

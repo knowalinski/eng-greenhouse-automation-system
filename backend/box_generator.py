@@ -40,6 +40,7 @@ class BoxGenerator:
         opener ='<!DOCTYPE html>\n<head>'\
                 '\n<title>DASHBOARD</title>'\
                 '\n<link rel="stylesheet" href="{{url_for(\'static\', filename=\'css/style.css\')}}">'\
+                '\n<meta http-equiv="refresh" content="60"> '\
                 '\n</head>'\
                 '\n<body>'\
                 '\n<h2>DASHBOARD <span id="dash-board"></span></h2>'\
