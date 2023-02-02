@@ -1,10 +1,14 @@
 import json
 import csv
 from datetime import datetime
-
+import pandas as pd
+import json
+import plotly
+import plotly.express as px
+import random
 
 class TimeOperator:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def get_datetime(self):
@@ -16,7 +20,7 @@ class TimeOperator:
     def send_datetime(self):
         return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
     
-    def delta_time(self, timestamp):
+    def delta_time(self, timestamp: str) -> float:
         datetime_object = datetime.strptime(timestamp, '%d-%m-%Y %H:%M:%S')
         deltatime = datetime.now() - datetime_object
         # print (deltatime)
@@ -28,7 +32,7 @@ class DataOperator:
     # ładowanie inputu w json-ie
     # parsowanie json-a
     # zrzucanie wartości do csv
-    def __init__(self, input_dictionary):
+    def __init__(self, input_dictionary) -> None:
         
         self.input_dict = input_dictionary
         self._load_json()
@@ -36,16 +40,16 @@ class DataOperator:
         self.timestamp = []
         self.sensor_id = 0
         
-    def _load_json(self):
+    def _load_json(self) -> None:
         d = json.loads(self.input_dict)
         self.input_dict = d
-        
-    def parse_data(self):
+     
+    def parse_data(self) -> None:
         self.values = list(self.input_dict.values())[1:5]
         self.timestamp = list(self.input_dict.values())[5:7]
         self.sensor_id = list(self.input_dict.values())[0]
-    
-    def csv_dump(self):
+
+    def csv_dump(self) -> None:
         self.parse_data()
         d = self.input_dict
         with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
@@ -55,22 +59,21 @@ class DataOperator:
 class OutputGenerator(TimeOperator):
     # generowanie słownika z ostatnimi rekordami
     # generowanie słownika stanów
-    def __init__(self):
+    def __init__(self) -> None:
         # latest records = {id:[timestamp, state]}
         super().__init__()
         self.latest_records = {}
         self.latest_timestamps = {}
         self.timestamp = ''
-    def decode_timestamp(self,timestamp_input):
+    def decode_timestamp(self,timestamp_input) -> None:
         self.timestamp = "{} {}".format(*timestamp_input)
         print(self.timestamp)
-        
-        
-    def update_records(self,id, values,timestamp):
+           
+    def update_records(self,id, values,timestamp) -> None:
         self.latest_records[id] = [1,[*values]]
         self.latest_timestamps[id] = [*timestamp]
         
-    def update_states(self):
+    def update_states(self) -> None:
         for key in self.latest_timestamps:
             self.decode_timestamp(self.latest_timestamps[key])
             # self.delta_time(self.timestamp)
@@ -84,17 +87,12 @@ class OutputGenerator(TimeOperator):
     
 
 class BoxGenerator:
-    def __init__(self, input_dict):
+    def __init__(self, input_dict) -> None:
         self.input_file = input_dict
         self.sensor_data = []
         self.sensor_id = 0
         self.html = ''
         self.state = ''
-    # def check_state(self, sensor_state):
-    #     if sensor_state == 1:
-    #         self.state = "activeSensor"
-    #     else:
-    #         self.state = "inactiveSensor"
     
     def state_class(self):
         return f'<div class = "{self.state}"><br>\n'
@@ -102,26 +100,26 @@ class BoxGenerator:
     def sensorID_label(self):
         return f'<label>sensor_{self.sensor_id}</label>\n'
 
-    def data_labels(self):
+    def data_labels(self) -> str:
         return '<br><label>Air temperature: {}</label><br>\n' \
             '<label>Air humidity: {}</label><br>\n' \
                 '<label>Soil temperature: {}</label><br>\n' \
                     '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
 
-    def merge(self):
-        a = self.state_class()
-        b = self.sensorID_label()
-        c = self.data_labels()
+    def merge(self) -> str:
+        a: str = self.state_class()
+        b: str = self.sensorID_label()
+        c: str = self.data_labels()
         return a+b+c
 
-    def replicate(self):
+    def replicate(self) -> None:
         for key in self.input_file:
             self.sensor_id = key
             self.state = "activeSensor" if self.input_file[key][0] else "inactiveSensor"
             self.sensor_data = self.input_file[key][1]
             self.html+=self.merge()
     
-    def generate_html(self):
+    def generate_html(self) -> str:
         opener ='<!DOCTYPE html>\n<head>'\
                 '\n<title>DASHBOARD</title>'\
                 '\n<link rel="stylesheet" href="{{url_for(\'static\', filename=\'css/style.css\')}}">'\
@@ -133,8 +131,34 @@ class BoxGenerator:
         self.replicate()
         return opener+self.html+'</body>\n</html>'
 
-    def html_dump(self):
+    def html_dump(self) -> None:
             with open('backend/templates/index.html', 'w') as f:
                 f.write(self.generate_html())
                 f.close()
 
+
+class DataReturner:
+    def __init__(self, sensor_id) -> None:
+        self.sensor_id = sensor_id
+    
+    def return_data(self):
+        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+            reader = csv.reader(file)
+            temperature = []
+            humidity = []
+            time = []
+            for row in reader:
+                temperature.append(float(row[1]))
+                humidity.append(float(row[3])*random.randint(1,5))
+                time.append(f"{row[5]} {row[6]}")
+
+        temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
+        humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
+        temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
+        humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
+        
+
+        temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        
+        return temperatureJSON, humidityJSON

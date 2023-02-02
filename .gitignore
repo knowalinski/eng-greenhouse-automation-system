@@ -3,6 +3,9 @@
 *.ipynb
 index.html
 settings.json
+playground.py
+notdash.html
+chartsajax.html
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
