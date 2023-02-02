@@ -1,7 +1,11 @@
 import json
 import csv
 from datetime import datetime
-
+import pandas as pd
+import json
+import plotly
+import plotly.express as px
+import random
 
 class TimeOperator:
     def __init__(self):
@@ -90,11 +94,6 @@ class BoxGenerator:
         self.sensor_id = 0
         self.html = ''
         self.state = ''
-    # def check_state(self, sensor_state):
-    #     if sensor_state == 1:
-    #         self.state = "activeSensor"
-    #     else:
-    #         self.state = "inactiveSensor"
     
     def state_class(self):
         return f'<div class = "{self.state}"><br>\n'
@@ -138,3 +137,76 @@ class BoxGenerator:
                 f.write(self.generate_html())
                 f.close()
 
+
+class DataReturner:
+    def __init__(self, sensor_id):
+        self.sensor_id = sensor_id
+    
+
+    def return_temperature(self):
+        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+        # Create a CSV reader object
+            reader = csv.reader(file)
+            temperature = []
+            humidity = []
+            time = []
+            # Extract the desired columns from each row
+            for row in reader:
+                temperature.append(float(row[1]))
+                humidity.append(float(row[3]))
+                time.append(f"{row[5]} {row[6]}")
+
+        df = pd.DataFrame(dict(time = time, temperature = temperature))
+
+        fig = px.line(df, x="time", y="temperature", title="T(t)")
+        
+
+        temperatureJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        print(fig.data[0])
+        
+        return temperatureJSON
+
+    def return_humidity(self):
+        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+        # Create a CSV reader object
+            reader = csv.reader(file)
+            temperature = []
+            humidity = []
+            time = []
+            # Extract the desired columns from each row
+            for row in reader:
+                temperature.append(float(row[1]))
+                humidity.append(float(row[3])*random.randint(1,5))
+                time.append(f"{row[5]} {row[6]}")
+
+        df = pd.DataFrame(dict(time = time, humidity = humidity))
+
+        fig = px.line(df, x="time", y="humidity", title="T(t)")
+        
+
+        humidityJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        print(fig.data[0])
+        
+        return humidityJSON
+    
+    def return_data(self):
+        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+            reader = csv.reader(file)
+            temperature = []
+            humidity = []
+            time = []
+            for row in reader:
+                temperature.append(float(row[1]))
+                humidity.append(float(row[3])*random.randint(1,5))
+                time.append(f"{row[5]} {row[6]}")
+
+        temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
+        humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
+        temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
+        humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
+        
+
+        temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        
+        return temperatureJSON, humidityJSON
