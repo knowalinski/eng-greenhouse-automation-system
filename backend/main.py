@@ -84,7 +84,7 @@ def redirecting_hub():
 @app.route("/plotting", methods = ['GET', 'POST'])
 def plotter():
     d = DataReturner(memory.a).return_data()
-    return render_template('chartsajax.html',  temperatureJSON=d[0], humidityJSON = d[1])
+    return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1])
 
 
 
