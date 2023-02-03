@@ -1,17 +1,3 @@
-# TODO: dodać routy dla dashboardu i plottera
-'''zrobiene: mało
-do zrobienia: 
-1.[DONE] sprawdzanie stanu czujników - generowanie boxów z odpowiednią klasą css
-    a. [DONE] wyciąganie timestampa z każdego czujnika (ostatni zarejestrowany pomiar)
-    b. [DONE] porównanie do rt
-    c. [DONE] sprawdzenie warunków
-2. cały plotting
-    a. [DONE] ai mówi, że plotly bedzie spoko i może w sumie być spoko
-    b. interakcja miedzy głównym routem a plotem
-3. zrobienie czujników
-4. [DONE] zrobienie kilku emulacji czujników
-5. '''
-
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import time
 import json
@@ -85,8 +71,6 @@ def redirecting_hub():
 def plotter():
     d = DataReturner(memory.a).return_data()
     return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1])
-
-
 
 
 if __name__ == "__main__":
