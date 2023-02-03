@@ -1,18 +1,14 @@
 *.csv
 *.exe
 *.ipynb
-index.html
 settings.json
 
 
 #playground files
 playground.py
-notdash.html
-chartsajax.html
 box_generator.py
 csv_playground.py
 test.html
-index.html
 
 
 
