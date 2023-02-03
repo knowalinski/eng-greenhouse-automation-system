@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body style="font-family:arial, sans-serif">
+    <h1>Data plotting</h1>
+    <form action = "/redirecting" method='POST'>
+        <button type="submit" name="button" value="go_back">GO BACK</button>
+    </form>
+    <div id="t_chart" class="chart"></div>
+    <div id="h_chart" class="chart"></div>
+
+</body>
+
+<script>
+    temperature_data = {{ temperatureJSON | safe }};
+    humidity_data = {{ humidityJSON | safe }};
+    //d.config={staticPlot: true};
+    Plotly.newPlot('t_chart', temperature_data, {});
+    Plotly.newPlot('h_chart', humidity_data, {});
+    
+</script>
+</html>
