@@ -74,17 +74,19 @@ class OutputGenerator(TimeOperator):
     def decode_timestamp(self,timestamp_input: str) -> None:
         '''dump data from timestamp into string'''
         self.timestamp = "{} {}".format(*timestamp_input)
-        # print(self.timestamp)
+
            
     def update_records(self, id: str|int, values: list, timestamp: list) -> None:
         '''create and update lists of latest incoming values'''
         self.latest_records[id] = [1,[*values]]
         self.latest_timestamps[id] = [*timestamp]
+        print(self.latest_timestamps)
         
     def update_states(self) -> None:
         '''calculate states of sensors (active/inactive) based on delta time'''
         for key in self.latest_timestamps:
             self.decode_timestamp(self.latest_timestamps[key])
+            
             # self.delta_time(self.timestamp)
             if self.delta_time(self.timestamp) > 1:
                 self.latest_records[key][0] = 0
@@ -94,18 +96,19 @@ class OutputGenerator(TimeOperator):
         print(self.latest_records)
         return self.latest_records
         
-    def return_timestamps(self) -> str:
+    def return_timestamps(self) -> str|dict:
         ''''return list of latest records timestamps'''
-        return self.timestamp
+        return self.latest_timestamps
 
 class BoxGenerator:
-    def __init__(self, input_dict: dict, time_stamp: dict | str) -> None:
-        self.input_file = input_dict
-        self.timestamp = time_stamp
+    def __init__(self, latest_records: dict, latest_timestamps: dict | str) -> None:
+        self.input_file = latest_records
+        self.timestamps = latest_timestamps
         self.sensor_data = []
         self.sensor_id = 0
         self.html = ''
         self.state = ''
+        self.timestamp = ''
         
     
     def state_class(self) -> str:
@@ -119,7 +122,6 @@ class BoxGenerator:
                 f'</form>\n'
                 
     def timestamp_labels(self) -> str:
-        # TODO: fix for timestamp generating and processing
         '''generate label with timestamp of latest record'''
         return f'<br><label>Time of last record {self.timestamp}</label><br>'
         
@@ -136,7 +138,7 @@ class BoxGenerator:
         b: str = self.sensorID_label()
         c: str = self.data_labels()
         d: str = self.timestamp_labels()
-        return a+b+c+d
+        return a+b+d+c
 
     def replicate(self) -> None:
         '''create boxes for every sensor contained in list of latest records'''
@@ -144,6 +146,7 @@ class BoxGenerator:
             self.sensor_id = key
             self.state = "activeSensor" if self.input_file[key][0] else "inactiveSensor"
             self.sensor_data = self.input_file[key][1]
+            self.timestamp = self.timestamps[key]
             self.html+=self.merge()
     
     def generate_html(self) -> str:
