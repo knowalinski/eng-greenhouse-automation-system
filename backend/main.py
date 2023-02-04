@@ -40,7 +40,7 @@ def collector():
 
             output_generator.update_records(data.sensor_id, data.values, data.timestamp)
             output_generator.update_states()
-            generator = BoxGenerator(output_generator.return_output())
+            generator = BoxGenerator(output_generator.return_output(), output_generator.return_timestamps())
             generator.html_dump()
 
             print(output_generator.latest_records)
