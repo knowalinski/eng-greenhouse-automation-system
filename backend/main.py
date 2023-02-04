@@ -29,7 +29,7 @@ def index():
     return render_template('index.html')
     
 
-# * route dodbierający ramki danych z esp32
+# * route odbierający ramki danych z esp32
 @app.route("/data-collector", methods=['POST'])
 def collector():
     if request.method == "POST":
@@ -67,6 +67,7 @@ def redirecting_hub():
         memory.update_a(data)
         return redirect("/plotting", code=302)
 
+# TODO: podzielić na plotting dla ostatnich x próbek i do wszystkich próbek
 @app.route("/plotting", methods = ['GET', 'POST'])
 def plotter():
     d = DataReturner(memory.a).return_data()
