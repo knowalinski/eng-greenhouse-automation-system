@@ -12,20 +12,22 @@ class TimeOperator:
         pass
 
     def get_datetime(self):
+        '''return timestamp based on actual time'''
         now = datetime.now()
         date_list = [now.day, now.month, now.year]
         time_list = [now.hour, now.minute, now.second]
         return date_list, time_list
 
     def send_datetime(self):
+        '''return dictionary containing timestamp'''
         return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
     
     def delta_time(self, timestamp: str) -> float:
+        '''calculate and return delta of actual time and given timestamp'''
         datetime_object = datetime.strptime(timestamp, '%d-%m-%Y %H:%M:%S')
         deltatime = datetime.now() - datetime_object
-        # print (deltatime)
         # return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
-        return deltatime.total_seconds()/10 # * zwraca czas w godzinach
+        return deltatime.total_seconds()/10
         
     
 class DataOperator:
@@ -41,15 +43,18 @@ class DataOperator:
         self.sensor_id = 0
         
     def _load_json(self) -> None:
+        '''decode json input into dictionary'''
         d = json.loads(self.input_dict)
         self.input_dict = d
      
     def parse_data(self) -> None:
+        '''split json sections'''
         self.values = list(self.input_dict.values())[1:5]
         self.timestamp = list(self.input_dict.values())[5:7]
         self.sensor_id = list(self.input_dict.values())[0]
 
     def csv_dump(self) -> None:
+        '''store incoming json data in separated csv files for every sensor'''
         self.parse_data()
         d = self.input_dict
         with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
@@ -65,54 +70,76 @@ class OutputGenerator(TimeOperator):
         self.latest_records = {}
         self.latest_timestamps = {}
         self.timestamp = ''
-    def decode_timestamp(self,timestamp_input) -> None:
+        
+    def decode_timestamp(self,timestamp_input: str) -> None:
+        '''dump data from timestamp into string'''
         self.timestamp = "{} {}".format(*timestamp_input)
-        print(self.timestamp)
+        # print(self.timestamp)
            
-    def update_records(self,id, values,timestamp) -> None:
+    def update_records(self, id: str|int, values: list, timestamp: list) -> None:
+        '''create and update lists of latest incoming values'''
         self.latest_records[id] = [1,[*values]]
         self.latest_timestamps[id] = [*timestamp]
         
     def update_states(self) -> None:
+        '''calculate states of sensors (active/inactive) based on delta time'''
         for key in self.latest_timestamps:
             self.decode_timestamp(self.latest_timestamps[key])
             # self.delta_time(self.timestamp)
             if self.delta_time(self.timestamp) > 1:
                 self.latest_records[key][0] = 0
                 
-    def return_output(self):
+    def return_output(self) -> dict:
+        '''return list of latest records'''
         print(self.latest_records)
         return self.latest_records
         
-    
+    def return_timestamps(self) -> str:
+        ''''return list of latest records timestamps'''
+        return self.timestamp
 
 class BoxGenerator:
-    def __init__(self, input_dict) -> None:
+    def __init__(self, input_dict: dict, time_stamp: dict | str) -> None:
         self.input_file = input_dict
+        self.timestamp = time_stamp
         self.sensor_data = []
         self.sensor_id = 0
         self.html = ''
         self.state = ''
+        
     
-    def state_class(self):
+    def state_class(self) -> str:
+        '''change box class based on calculated sensor state'''
         return f'<div class = "{self.state}"><br>\n'
 
-    def sensorID_label(self):
-        return f'<label>sensor_{self.sensor_id}</label>\n'
-
+    def sensorID_label(self) -> str:
+        '''generate button with value and label based on sensor ID'''
+        return f'<form action = "/redirecting" method="POST">\n'\
+            f'<button type="submit" name="button" value="{self.sensor_id}">Sensor {self.sensor_id}</button>\n'\
+                f'</form>\n'
+                
+    def timestamp_labels(self) -> str:
+        # TODO: fix for timestamp generating and processing
+        '''generate label with timestamp of latest record'''
+        return f'<br><label>Time of last record {self.timestamp}</label><br>'
+        
     def data_labels(self) -> str:
+        '''generate labels with reading from lastest record'''
         return '<br><label>Air temperature: {}</label><br>\n' \
             '<label>Air humidity: {}</label><br>\n' \
                 '<label>Soil temperature: {}</label><br>\n' \
                     '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
 
     def merge(self) -> str:
+        '''merge generated lines into one string'''
         a: str = self.state_class()
         b: str = self.sensorID_label()
         c: str = self.data_labels()
-        return a+b+c
+        d: str = self.timestamp_labels()
+        return a+b+c+d
 
     def replicate(self) -> None:
+        '''create boxes for every sensor contained in list of latest records'''
         for key in self.input_file:
             self.sensor_id = key
             self.state = "activeSensor" if self.input_file[key][0] else "inactiveSensor"
@@ -120,21 +147,22 @@ class BoxGenerator:
             self.html+=self.merge()
     
     def generate_html(self) -> str:
+        '''merge generated bits and add immutable parts of html into one string'''
         opener ='<!DOCTYPE html>\n<head>'\
                 '\n<title>DASHBOARD</title>'\
                 '\n<link rel="stylesheet" href="{{url_for(\'static\', filename=\'css/style.css\')}}">'\
                 '\n<meta http-equiv="refresh" content="60"> '\
                 '\n</head>'\
                 '\n<body>'\
-                '\n<h2>DASHBOARD <span id="dash-board"></span></h2>'\
-                '\n<button id = goto-plotting>plotting</button>\n'
+                '\n<h2>DASHBOARD <span id="dash-board"></span></h2>\n'
         self.replicate()
         return opener+self.html+'</body>\n</html>'
 
     def html_dump(self) -> None:
-            with open('backend/templates/index.html', 'w') as f:
-                f.write(self.generate_html())
-                f.close()
+        '''dump generated string into html file'''
+        with open('backend/templates/index.html', 'w') as f:
+            f.write(self.generate_html())
+            f.close()
 
 
 class DataReturner:
@@ -142,6 +170,7 @@ class DataReturner:
         self.sensor_id = sensor_id
     
     def return_data(self):
+        '''create jsons with data from csv files for plotting'''
         with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
             reader = csv.reader(file)
             temperature = []
