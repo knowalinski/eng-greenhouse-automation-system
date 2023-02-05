@@ -4,7 +4,13 @@ import json
 import csv
 import random
 from datetime import datetime
-from data_operator import DataOperator, TimeOperator, BoxGenerator, OutputGenerator, DataReturner
+from data_operator import DataOperator, TimeOperator, BoxGenerator, OutputGenerator, DataPlotter
+
+# TODO: add option for plotting x records and all records
+# TODO: change archive files from .csv to something faster to read
+# TODO: reduce dataframe to two possitions
+
+
 
 app = Flask(__name__)
 output_generator = OutputGenerator()
@@ -70,7 +76,7 @@ def redirecting_hub():
 # TODO: podzielić na plotting dla ostatnich x próbek i do wszystkich próbek
 @app.route("/plotting", methods = ['GET', 'POST'])
 def plotter():
-    d = DataReturner(memory.a).return_data()
+    d = DataPlotter(memory.a).return_all_data()
     return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1])
 
 
