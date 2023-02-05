@@ -6,11 +6,12 @@ import json
 import plotly
 import plotly.express as px
 import random
+import pickle
 
 class TimeOperator:
     def __init__(self) -> None:
         pass
-
+        
     def get_datetime(self):
         '''return timestamp based on actual time'''
         now = datetime.now()
@@ -64,6 +65,7 @@ class DataOperator:
 class OutputGenerator(TimeOperator):
     # generowanie słownika z ostatnimi rekordami
     # generowanie słownika stanów
+    
     def __init__(self) -> None:
         # latest records = {id:[timestamp, state]}
         super().__init__()
@@ -168,11 +170,34 @@ class BoxGenerator:
             f.close()
 
 
-class DataReturner:
+class DataPlotter:
     def __init__(self, sensor_id) -> None:
         self.sensor_id = sensor_id
-    
-    def return_data(self):
+       
+    def plot_some_data(self):
+        '''create jsons with data from csv files for plotting'''
+        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+            reader = csv.reader(file)
+            temperature = []
+            humidity = []
+            time = []
+            for row, iterator in zip(reader,range(24)):
+                temperature.append(float(row[1]))
+                humidity.append(float(row[3])*random.randint(1,5))
+                time.append(f"{row[5]} {row[6]}")
+
+        temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
+        humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
+        temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
+        humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
+        
+
+        temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        
+        return temperatureJSON, humidityJSON
+
+    def return_all_data(self):
         '''create jsons with data from csv files for plotting'''
         with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
             reader = csv.reader(file)
