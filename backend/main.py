@@ -18,10 +18,14 @@ output_generator = OutputGenerator()
 class DataStore:
     def __init__(self):
         self.a = None
+        self.b = None
         
     def update_a(self, variable):
         print(variable)
         self.a = variable
+    
+    def update_b(self, variable):
+        self.b = variable
 
 memory = DataStore()
 
@@ -40,7 +44,6 @@ def index():
 def collector():
     if request.method == "POST":
         try:
-            
             data = DataOperator(request.data)
             data.csv_dump()
 
@@ -51,7 +54,9 @@ def collector():
 
             print(output_generator.latest_records)
             print("data collected")
+            memory.update_b(1)
         except ValueError:
+            memory.update_b(2)
             print("Decoding failed")
     print(type(request.data))
 
@@ -79,6 +84,11 @@ def plotter():
     d = DataPlotter(memory.a).return_all_data()
     return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1])
 
+@app.route("/feedback", methods = ['GET'])
+def feedback():
+    feedback_dict = {"state":memory.b}
+    memory.update_b
+    return json.dumps(feedback_dict)
 
 if __name__ == "__main__":
     # * host 0.0.0.0 po to, żeby odpaliło się w sieci lokalnej a nie tylko na localhoscie
