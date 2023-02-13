@@ -1,6 +1,8 @@
 *.csv
 *.exe
 *.ipynb
+*.tmp
+~$zynierka_draft.docx
 settings.json
 
 
