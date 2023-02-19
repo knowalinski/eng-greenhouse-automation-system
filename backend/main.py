@@ -6,11 +6,6 @@ import random
 from datetime import datetime
 from data_operator import DataOperator, TimeOperator, BoxGenerator, OutputGenerator, DataPlotter
 
-# TODO: add option for plotting x records and all records
-# TODO: change archive files from .csv to something faster to read
-# TODO: reduce dataframe to two possitions
-
-
 
 app = Flask(__name__)
 output_generator = OutputGenerator()
@@ -44,6 +39,7 @@ def index():
 def collector():
     if request.method == "POST":
         try:
+            print(request.data)
             data = DataOperator(request.data)
             data.csv_dump()
 
@@ -55,6 +51,7 @@ def collector():
             print(output_generator.latest_records)
             print("data collected")
             memory.update_b(1)
+        
         except ValueError:
             memory.update_b(2)
             print("Decoding failed")
@@ -82,7 +79,7 @@ def redirecting_hub():
 @app.route("/plotting", methods = ['GET', 'POST'])
 def plotter():
     d = DataPlotter(memory.a).return_all_data()
-    return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1])
+    return render_template('plotting.html',  temperatureJSON=d[0], humidityJSON = d[1], moistureJSON = d[2])
 
 @app.route("/feedback", methods = ['GET'])
 def feedback():
