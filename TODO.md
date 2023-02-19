@@ -5,15 +5,16 @@ this is TODO file created on 19.02.2023
 - [ ]  frontend
   - [ ]  dodanie sensownego .css
   - [ ]  refaktor
+  - [x]  ogarnięcie działania plottingu
 - [ ]  backend
-  - [ ]  przystosować do nowej ramki danych
+  - [x]  przystosować do nowej ramki danych
   - [ ]  refaktoryzacja
 - [ ]  firmware
   - [ ]  zabezpieczenia przed pomiarami na wyłączonym wifi
   - [ ]  zabezpieczenie przed wysyłaniem na wyłączonym wifi
   - [ ]  refaktoryzacja kodu
 - [ ] hardware
-  - [ ] poprawić modele
+  - [x] poprawić modele
   - [ ] wydrukować i złożyć obudowy
   - [ ] poprawić kable
   - [ ] dodać zewnętrzne zasilanie z lini 5V
