@@ -6,7 +6,6 @@ import json
 import plotly
 import plotly.express as px
 import random
-import pickle
 
 class TimeOperator:
     def __init__(self) -> None:
@@ -50,8 +49,8 @@ class DataOperator:
      
     def parse_data(self) -> None:
         '''split json sections'''
-        self.values = list(self.input_dict.values())[1:5]
-        self.timestamp = list(self.input_dict.values())[5:7]
+        self.values = list(self.input_dict.values())[1:4]
+        self.timestamp = list(self.input_dict.values())[4:6]
         self.sensor_id = list(self.input_dict.values())[0]
 
     def csv_dump(self) -> None:
@@ -131,8 +130,7 @@ class BoxGenerator:
         '''generate labels with reading from lastest record'''
         return '<br><label>Air temperature: {}</label><br>\n' \
             '<label>Air humidity: {}</label><br>\n' \
-                '<label>Soil temperature: {}</label><br>\n' \
-                    '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
+            '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
 
     def merge(self) -> str:
         '''merge generated lines into one string'''
@@ -174,48 +172,55 @@ class DataPlotter:
     def __init__(self, sensor_id) -> None:
         self.sensor_id = sensor_id
        
-    def plot_some_data(self):
+    # def plot_some_data(self):
+    #     '''create jsons with data from csv files for plotting'''
+    #     with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
+    #         reader = csv.reader(file)
+    #         temperature = []
+    #         humidity = []
+    #         moisture = []
+    #         time = []
+    #         for row, iterator in zip(reader,range(24)):
+    #             temperature.append(float(row[1]))
+    #             humidity.append(float(row[2]))
+    #             moisture.append(float(row[3]))
+    #             time.append(f"{row[4]} {row[5]}")
+
+    #     temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
+    #     humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
+    #     moisture_df = pd.DataFrame(dict(time = time, moisture = moisture))
+    #     temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
+    #     humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
+    #     moisture_fig = px.line(moisture_df, x="time", y="moisture", title=f"Soil moisture from sensor {self.sensor_id}")
+
+    #     temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    #     humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    #     moistrureJSON = json.dumps(moisture_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        
+    #     return temperatureJSON, humidityJSON
+
+    def return_all_data(self) -> tuple:
         '''create jsons with data from csv files for plotting'''
         with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
             reader = csv.reader(file)
             temperature = []
             humidity = []
-            time = []
-            for row, iterator in zip(reader,range(24)):
-                temperature.append(float(row[1]))
-                humidity.append(float(row[3])*random.randint(1,5))
-                time.append(f"{row[5]} {row[6]}")
-
-        temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
-        humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
-        temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
-        humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
-        
-
-        temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
-        humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
-        
-        return temperatureJSON, humidityJSON
-
-    def return_all_data(self):
-        '''create jsons with data from csv files for plotting'''
-        with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
-            reader = csv.reader(file)
-            temperature = []
-            humidity = []
+            moisture = []
             time = []
             for row in reader:
-                temperature.append(float(row[1]))
-                humidity.append(float(row[3])*random.randint(1,5))
-                time.append(f"{row[5]} {row[6]}")
-
+                temperature.append(round(float(row[1]),2))
+                humidity.append(round(float(row[2]),2))
+                moisture.append(round(float(row[3]),2))
+                time.append(f"{row[4]} {row[5]}")
         temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
         humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
+        moisture_df = pd.DataFrame(dict(time = time, moisture = moisture))
         temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
         humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
-        
+        moisture_fig = px.line(moisture_df, x="time", y="moisture", title=f"Soil moisture from sensor {self.sensor_id}")
 
         temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
         humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        moistureJSON = json.dumps(moisture_fig, cls=plotly.utils.PlotlyJSONEncoder)
         
-        return temperatureJSON, humidityJSON
+        return temperatureJSON, humidityJSON, moistureJSON

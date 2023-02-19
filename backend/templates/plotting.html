@@ -13,15 +13,19 @@
     </form>
     <div id="t_chart" class="chart"></div>
     <div id="h_chart" class="chart"></div>
+    <div id="m_chart" class="chart"></div>
 
 </body>
 
 <script>
+    moisture_data = {{ moistureJSON | safe }};
     temperature_data = {{ temperatureJSON | safe }};
     humidity_data = {{ humidityJSON | safe }};
-    //d.config={staticPlot: true};
+    
+    
     Plotly.newPlot('t_chart', temperature_data, {});
     Plotly.newPlot('h_chart', humidity_data, {});
+    Plotly.newPlot('m_chart', moisture_data, {});
     
 </script>
 </html>
