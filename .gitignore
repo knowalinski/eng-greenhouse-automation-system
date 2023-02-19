@@ -2,6 +2,9 @@
 *.exe
 *.ipynb
 *.tmp
+*.cfg
+*.svd
+debug_custom.json
 ~$zynierka_draft.docx
 settings.json
 
