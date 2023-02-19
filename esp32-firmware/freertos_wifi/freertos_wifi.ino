@@ -6,45 +6,42 @@
 #include <driver/adc.h>
 #include "Adafruit_SHT31.h"
 
-#define AOUT_PIN 36
+
 
 #pragma region VARIABLES
-const char* ssid = "toya525443076";
-const char* password = "05921029";
+#define AOUT_PIN 36
+
+const char *ssid = "toya525443076";
+const char *password = "05921029";
 
 int sensorID = 1;
 
-
-
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
 
-double prevTemperature = 0, prevHumidity = 0;
-double temperature = 0, humidity = 0, soilMoisture;
+double prevTemperature = 0, prevHumidity = 0, prevMoisture = 0;
+double temperature, humidity, soilMoisture;
 
 // deklaracje handlerów tasków
 TaskHandle_t wifiTask;
 TaskHandle_t httpTask;
 TaskHandle_t sensorTask;
 TaskHandle_t sensorOperatorTask;
-//TaskHandle_t httpTask;
-//TaskHandle_t sensorTask;
-
 
 String dataFrame = "";
 String getTime = "";
 
 // deklaracja ledów do wizualizacji w taskach
 const int led_1 = 15, led_2 = 2;
-//const int led_2 = 2;
+
 #pragma endregion // VARIABLES
 
 #pragma region SETUP
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   sht31.begin(0x44);
   pinMode(led_1, OUTPUT);
   pinMode(led_2, OUTPUT);
-
 
   // stworzenie tasków wykonujących poszczególne funkcje
   xTaskCreatePinnedToCore(wifiTaskCode, "wifi task", 10000, NULL, 2, &wifiTask, 0);
@@ -61,20 +58,25 @@ void setup() {
 }
 #pragma endregion // SETUP
 
-#pragma region TASKS
-void wifiTaskCode(void* parameter) {
+#pragma region WIFI
+void wifiTaskCode(void *parameter)
+{
   Serial.print("wifi task is running on core ");
   Serial.println(xPortGetCoreID());
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   delay(10000);
-  for (;;) {
+  for (;;)
+  {
     digitalWrite(led_1, HIGH);
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("connected");  // TODO: uptime
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      Serial.println("connected"); // TODO: uptime
       delay(5000);
       // continue;
-    } else {
+    }
+    else
+    {
       Serial.print("reconnecting\n");
       WiFi.mode(WIFI_STA);
       WiFi.begin(ssid, password);
@@ -85,15 +87,19 @@ void wifiTaskCode(void* parameter) {
   }
 }
 
+#pragma endregion // WIFI
 
-
-void httpHandlerTask(void* parameter) {
+#pragma region HTTP
+void httpHandlerTask(void *parameter)
+{
   Serial.print("http_handler task is running on core ");
   Serial.println(xPortGetCoreID());
 
-  for (;;) {
+  for (;;)
+  {
     digitalWrite(led_2, HIGH);
-    if (WiFi.status() == WL_CONNECTED) {
+    if (WiFi.status() == WL_CONNECTED)
+    {
       HTTPClient http;
 
       // http.begin("https://servertest.knowalinski.repl.co");
@@ -110,43 +116,68 @@ void httpHandlerTask(void* parameter) {
     delay(100);
   }
 }
+#pragma endregion // HTTP
 
+#pragma region SENSOR_OPERATOR
+void sensorOperator(void *parameter)
+{
 
-void sensorOperator(void* parameter) {
+  for (;;)
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      double temperatureReading = sht31.readTemperature();
+      double humidityReading = sht31.readHumidity();
 
-  for(;;){
-  if (WiFi.status() == WL_CONNECTED)
-  {double temperatureReading = sht31.readTemperature();
-  double humidityReading = sht31.readHumidity();
+      if (!isnan(temperatureReading))
+      {
+        temperature = temperatureReading;
+        prevTemperature = temperatureReading;
+      }
+      else
+      {
+        temperature = prevTemperature;
+      }
 
-  if (!isnan(temperatureReading)) {
-    temperature = temperatureReading;
-    prevTemperature = temperatureReading;
-  } else {
-    temperature = prevTemperature;
-  }
+      if (!isnan(humidityReading))
+      {
+        humidity = humidityReading;
+        prevHumidity = humidityReading;
+      }
+      else
+      {
+        humidity = prevHumidity;
+      }
 
-  if (!isnan(humidityReading)) {
-    humidity = humidityReading;
-    prevHumidity = humidityReading;
-  } else {
-    humidity = prevHumidity;
-  }
+      double soilMoistureReading = analogRead(AOUT_PIN);
+      soilMoistureReading = map(soilMoistureReading, 100, 600, 10000, 0);
+      soilMoistureReading = soilMoistureReading / 100;
+      if (0 < soilMoistureReading && soilMoistureReading < 100)
+      {
+        soilMoisture = soilMoistureReading;
+        prevMoisture = soilMoistureReading;
+      }
+      else
+      {
+        soilMoisture = prevMoisture;
+      }
 
-  double value = analogRead(AOUT_PIN);
-  soilMoisture = map(value, 100, 600, 10000, 0);
-  soilMoisture = soilMoisture / 100;
-  Serial.println(value);
-  Serial.println(soilMoisture);
-  delay(1000);}
+      delay(1000);
+    }
   }
 }
+#pragma endregion // DATA_OPERATOR
 
-void sensorDataCollector(void* parameter) {
+#pragma region DATA_COLLECTOR
+void sensorDataCollector(void *parameter)
+{
   StaticJsonDocument<1024> doc;
   StaticJsonDocument<256> docTime;
-  for (;;) {
-    dataFrame.clear();
+  for (;;)
+  
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {dataFrame.clear();
     doc.clear();
     docTime.clear();
     getTime.clear();
@@ -158,7 +189,8 @@ void sensorDataCollector(void* parameter) {
 
     deserializeJson(docTime, getTime);
     Serial.println(getTime);
-    if (!docTime["date"].isNull() || !docTime["time"].isNull()) {
+    if (!docTime["date"].isNull() || !docTime["time"].isNull())
+    {
       doc["sensor_id"] = sensorID;
       doc["air_temperature"] = temperature;
       doc["air_humidity"] = humidity;
@@ -170,11 +202,11 @@ void sensorDataCollector(void* parameter) {
       Serial.println(dataFrame);
     }
 
-
     delay(9000);
-  }
+  }}
 }
 #pragma endregion // TASKS
 
-
-void loop() {}
+void loop()
+{
+}
