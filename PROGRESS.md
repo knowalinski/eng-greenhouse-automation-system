@@ -1,0 +1,42 @@
+## POSTĘP PRACY
+----
+#### ZROBIONE:
+
+- [x] BACKEND
+  - [x] udostepnienie aplikacji w sieci lokalnej
+  - [x] endpointy publikujący czas
+  - [x] endpoint odbierający dataframe
+  - [x] przetwarzanie pomiarów
+  - [x] tworzenie historii pomiarów w .csv
+  - [x] generowanie HTML interfejsu na podstawie ilości czujników
+  - [x] zmiana elementów interfejsu na podstawie stanu czujników
+  - [x] generowanie interfejsu z wykresami
+- [ ] FRONTEND
+  - [x] interfejs pokazujący ostatnie pomiary
+  - [x] interfejs rysujący wykresy pomiarów wybranego czujnika
+  - [ ] [2h] CSS, żeby całość wyglądała w miare dobrze
+- [x] FIRMWARE
+  - [x] łączenie z WIFI
+  - [x] utrzymywanie połączenia z WIFI
+  - [x] wykonywanie pomiarów czujnikami
+  - [x] łączenie z aplikacją serwerową
+  - [x] pobieranie czasu z serwera
+  - [x] zrzucanie pomiarów do ramki danych
+  - [x] przesyłanie ramki danych
+- [x] HARDWARE
+  - [x] zrobienie schematu
+  - [x] zlutowanie całości na płytce
+  - [x] zaprojektowanie obudowy
+  - [x] złożenie urządzenia pomiarowego
+- [x] TOOLS and TESTS
+  - [x] test stabilności połączenia serwer - czujnik
+  - [x] test szybkości odczytu plików .csv
+  - [x] symulowanie czujników za pomocą skryptu
+- [ ] PRACA
+  - [ ] [2 dni]teoria
+  - [ ] [5 dni]opis projektu
+    - [x] hardware
+    - [x] firmware
+    - [x] backend
+    - [ ] frontend
+    - [x] testy
