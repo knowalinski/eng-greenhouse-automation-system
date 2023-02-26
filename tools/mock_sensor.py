@@ -31,6 +31,7 @@ def generate_dataframe():
                        "time": "{:02d}:{:02d}:{:02d}".format(*get_datetime()[1])})
 
 
-while True:
-    generate_dataframe()
-    time.sleep(1)
+if __name__ == "__main__":
+    while True:
+        generate_dataframe()
+        time.sleep(1)
