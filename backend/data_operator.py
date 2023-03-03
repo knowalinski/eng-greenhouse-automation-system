@@ -20,7 +20,8 @@ class TimeOperator:
 
     def send_datetime(self):
         '''return dictionary containing timestamp'''
-        return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]), "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
+        return {"date": "{:02d}-{:02d}-{}".format(*self.get_datetime()[0]),
+                "time": "{:02d}:{:02d}:{:02d}".format(*self.get_datetime()[1])}
     
     def delta_time(self, timestamp: str) -> float:
         '''calculate and return delta of actual time and given timestamp'''
@@ -31,9 +32,6 @@ class TimeOperator:
         
     
 class DataOperator:
-    # ładowanie inputu w json-ie
-    # parsowanie json-a
-    # zrzucanie wartości do csv
     def __init__(self, input_dictionary) -> None:
         
         self.input_dict = input_dictionary
@@ -47,7 +45,7 @@ class DataOperator:
         d = json.loads(self.input_dict)
         self.input_dict = d
      
-    def parse_data(self) -> None:
+    def _parse_data(self) -> None:
         '''split json sections'''
         self.values = list(self.input_dict.values())[1:4]
         self.timestamp = list(self.input_dict.values())[4:6]
@@ -55,18 +53,14 @@ class DataOperator:
 
     def csv_dump(self) -> None:
         '''store incoming json data in separated csv files for every sensor'''
-        self.parse_data()
+        self._parse_data()
         d = self.input_dict
         with open(f'backend/dataSensor{d["sensor_id"]}.csv', 'a', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(list(d.values()))
 
-class OutputGenerator(TimeOperator):
-    # generowanie słownika z ostatnimi rekordami
-    # generowanie słownika stanów
-    
+class OutputGenerator(TimeOperator):   
     def __init__(self) -> None:
-        # latest records = {id:[timestamp, state]}
         super().__init__()
         self.latest_records = {}
         self.latest_timestamps = {}
@@ -87,8 +81,6 @@ class OutputGenerator(TimeOperator):
         '''calculate states of sensors (active/inactive) based on delta time'''
         for key in self.latest_timestamps:
             self.decode_timestamp(self.latest_timestamps[key])
-            
-            # self.delta_time(self.timestamp)
             if self.delta_time(self.timestamp) > 1:
                 self.latest_records[key][0] = 0
                 
@@ -119,18 +111,19 @@ class BoxGenerator:
     def sensorID_label(self) -> str:
         '''generate button with value and label based on sensor ID'''
         return f'<form action = "/redirecting" method="POST">\n'\
-            f'<button type="submit" name="button" value="{self.sensor_id}">Sensor {self.sensor_id}</button>\n'\
-                f'</form>\n'
+            f'<button type="submit" name="button" value="{self.sensor_id}">'\
+            f'SENSOR {self.sensor_id}</button>\n'\
+            f'</form>\n'
                 
     def timestamp_labels(self) -> str:
         '''generate label with timestamp of latest record'''
-        return f'<br><label>Time of last record {self.timestamp}</label><br>'
+        return '<br><h2>Time of last record {} {}</h2>'.format(*self.timestamp)
         
     def data_labels(self) -> str:
         '''generate labels with reading from lastest record'''
-        return '<br><label>Air temperature: {}</label><br>\n' \
-            '<label>Air humidity: {}</label><br>\n' \
-            '<label>Soil humidity: {}</label><br>\n</div>\n'.format(*self.sensor_data)
+        return '<h2>Air temperature: {:.2f}*C</h2>\n' \
+            '<h2>Air humidity: {:.2f}%</h2>\n' \
+            '<h2>Soil humidity: {:.2f}%</h2>\n</div>\n'.format(*self.sensor_data)
 
     def merge(self) -> str:
         '''merge generated lines into one string'''
@@ -165,39 +158,13 @@ class BoxGenerator:
         '''dump generated string into html file'''
         with open('backend/templates/index.html', 'w') as f:
             f.write(self.generate_html())
+
             f.close()
 
 
 class DataPlotter:
     def __init__(self, sensor_id) -> None:
         self.sensor_id = sensor_id
-       
-    # def plot_some_data(self):
-    #     '''create jsons with data from csv files for plotting'''
-    #     with open(f'backend/dataSensor{self.sensor_id}.csv', 'r') as file:
-    #         reader = csv.reader(file)
-    #         temperature = []
-    #         humidity = []
-    #         moisture = []
-    #         time = []
-    #         for row, iterator in zip(reader,range(24)):
-    #             temperature.append(float(row[1]))
-    #             humidity.append(float(row[2]))
-    #             moisture.append(float(row[3]))
-    #             time.append(f"{row[4]} {row[5]}")
-
-    #     temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
-    #     humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
-    #     moisture_df = pd.DataFrame(dict(time = time, moisture = moisture))
-    #     temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
-    #     humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
-    #     moisture_fig = px.line(moisture_df, x="time", y="moisture", title=f"Soil moisture from sensor {self.sensor_id}")
-
-    #     temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
-    #     humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
-    #     moistrureJSON = json.dumps(moisture_fig, cls=plotly.utils.PlotlyJSONEncoder)
-        
-    #     return temperatureJSON, humidityJSON
 
     def return_all_data(self) -> tuple:
         '''create jsons with data from csv files for plotting'''
