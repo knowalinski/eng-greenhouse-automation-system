@@ -1,16 +1,44 @@
+html {
+  font-size: 16px;
+  background-color: lightsteelblue;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  padding: 0;
+  padding: 0;
+}
+
+button {
+  background-color: lightgray;
+  margin: 0;
+  width: 80%;
+  font-size: large;
+  font-weight: bold;
+  padding: 10px;
+  border: 5px solid black;
+  border-radius: 10px;
+}
+
 .inactiveSensor {
+  display: flex;
+  flex-direction: column;
   background-color: tomato;
   color: white;
+  padding: 10px;
   border: 2px solid black;
-  margin: 20px;
-  padding: 20px;
+  border-radius: 10px;
+  margin: 50px;
   text-align: center;
 }
 .activeSensor {
+  display: flex;
+  flex-direction: column;
   background-color: green;
   color: white;
+  padding: 10px;
   border: 2px solid black;
-  margin: 20px;
-  padding: 20px;
+  border-radius: 10px;
+  margin: 50px;
   text-align: center;
 }
