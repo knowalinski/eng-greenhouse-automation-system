@@ -24,11 +24,11 @@ def mock_sensor(body):
 def generate_dataframe():
     print("dataframe generated")
     return json.dumps({"sensor_id": random.randint(3,9),
-                       "air_temperature": random_output(40,50,2),
-                       "air_humidity": random_output(20,25,2), 
-                       "soil_moisture": random_output(0,50,1),
-                       "date": "{:02d}-{:02d}-{}".format(*get_datetime()[0]),
-                       "time": "{:02d}:{:02d}:{:02d}".format(*get_datetime()[1])})
+        "air_temperature": random_output(40,50,2),
+        "air_humidity": random_output(20,25,2), 
+        "soil_moisture": random_output(0,50,1),
+        "date": "{:02d}-{:02d}-{}".format(*get_datetime()[0]),
+        "time": "{:02d}:{:02d}:{:02d}".format(*get_datetime()[1])})
 
 
 if __name__ == "__main__":
