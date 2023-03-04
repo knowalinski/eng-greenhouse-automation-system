@@ -71,9 +71,8 @@ void wifiTaskCode(void *parameter)
     digitalWrite(led_1, HIGH);
     if (WiFi.status() == WL_CONNECTED)
     {
-      Serial.println("connected"); // TODO: uptime
+      Serial.println("connected");
       delay(5000);
-      // continue;
     }
     else
     {
@@ -102,10 +101,8 @@ void httpHandlerTask(void *parameter)
     {
       HTTPClient http;
 
-      // http.begin("https://servertest.knowalinski.repl.co");
       http.begin("http://10.5.101.7:5000/data-collector");
 
-      // http.begin("https://servertest.knowalinski.repl.co/data-collector");
       http.addHeader("Content-Type", "text/plain");
       http.POST(dataFrame);
       http.end();
