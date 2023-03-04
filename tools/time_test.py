@@ -10,7 +10,8 @@ import plotly.express as px
 def check_time(body):
     def wrapper(*arg, **kw):
         start_time = time.time()
-        print(f"Time of parsing .csv file with {body(*arg, **kw)} records is: {time.time()-start_time}\n")
+        print(f"Time of parsing .csv file with {body(*arg, **kw)}"
+              f"/records is: {time.time()-start_time}\n")
     return wrapper
 
 @check_time
