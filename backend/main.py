@@ -10,7 +10,7 @@ class DataStore:
         self.a = None
         
     def update_a(self, variable):
-        print(variable)
+        # print(variable)
         self.a = variable
     
 
@@ -23,7 +23,7 @@ def index():
     return render_template('index.html')
     
 
-# * route odbierający ramki danych z esp32
+
 @app.route("/data-collector", methods=['POST'])
 def collector():
     try:
@@ -36,18 +36,18 @@ def collector():
         generator = BoxGenerator(output_generator.return_output(),
                                 output_generator.return_timestamps())
         generator.html_dump()
-        print("data collected")
+        # print("data collected")
+        print(request.data)
     except ValueError:
         print("Decoding failed")
 
     return "data-collector"
 
 
-# * route publikujący czas - pozwala na zrezygnowanie z fizycznego RTC w ESP32
-# * (czas jest potrzebny jako identyfikator próbek w ramkach danych z czujników)
 @app.route("/get-datetime", methods=['GET'])
 def date_time():
     return(TimeOperator().send_datetime())
+
 
 @app.route("/redirecting", methods = ['GET', 'POST'])
 def redirecting_hub():
@@ -58,15 +58,19 @@ def redirecting_hub():
         memory.update_a(data)
         return redirect("/plotting", code=302)
 
-# TODO: podzielić na plotting dla ostatnich x próbek i do wszystkich próbek
+
 @app.route("/plotting", methods = ['GET', 'POST'])
 def plotter():
     d = DataPlotter(memory.a).return_all_data()
     return render_template('plotting.html',
-                           temperatureJSON=d[0],
+                           temperatureJSON = d[0],
                            humidityJSON = d[1],
                            moistureJSON = d[2])
 
+
+@app.route("/get-data", methods = ['GET', 'POST'])
+def get_data():
+    return output_generator.return_output()
 
 if __name__ == "__main__":
     # * host 0.0.0.0 po to, żeby odpaliło się w sieci lokalnej a nie tylko na localhoscie
