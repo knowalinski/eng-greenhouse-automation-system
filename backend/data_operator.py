@@ -27,7 +27,7 @@ class TimeOperator:
         '''calculate and return delta of actual time and given timestamp'''
         datetime_object = datetime.strptime(timestamp, '%d-%m-%Y %H:%M:%S')
         deltatime = datetime.now() - datetime_object
-        # return deltatime.total_seconds()/3600 # * zwraca czas w godzinach
+        return deltatime.total_seconds()/3600
         return deltatime.total_seconds()/10
         
     
@@ -75,7 +75,7 @@ class OutputGenerator(TimeOperator):
         '''create and update lists of latest incoming values'''
         self.latest_records[id] = [1,[*values]]
         self.latest_timestamps[id] = [*timestamp]
-        print(self.latest_timestamps)
+        # print(self.latest_timestamps)
         
     def update_states(self) -> None:
         '''calculate states of sensors (active/inactive) based on delta time'''
@@ -86,13 +86,14 @@ class OutputGenerator(TimeOperator):
                 
     def return_output(self) -> dict:
         '''return list of latest records'''
-        print(self.latest_records)
+        # print(self.latest_records)
         return self.latest_records
         
     def return_timestamps(self) -> str|dict:
         ''''return list of latest records timestamps'''
         return self.latest_timestamps
-
+    
+    
 class BoxGenerator:
     def __init__(self, latest_records: dict, latest_timestamps: dict | str) -> None:
         self.input_file = latest_records
@@ -103,7 +104,6 @@ class BoxGenerator:
         self.state = ''
         self.timestamp = ''
         
-    
     def state_class(self) -> str:
         '''change box class based on calculated sensor state'''
         return f'<div class = "{self.state}"><br>\n'
@@ -158,7 +158,6 @@ class BoxGenerator:
         '''dump generated string into html file'''
         with open('backend/templates/index.html', 'w') as f:
             f.write(self.generate_html())
-
             f.close()
 
 
@@ -182,12 +181,22 @@ class DataPlotter:
         temperature_df = pd.DataFrame(dict(time = time, temperature = temperature))
         humidity_df = pd.DataFrame(dict(time = time, humidity = humidity))
         moisture_df = pd.DataFrame(dict(time = time, moisture = moisture))
-        temperature_fig = px.line(temperature_df, x="time", y="temperature", title=f"Temperature from sensor {self.sensor_id}")
-        humidity_fig = px.line(humidity_df, x="time", y="humidity", title=f"Humidity from sensor {self.sensor_id}")
-        moisture_fig = px.line(moisture_df, x="time", y="moisture", title=f"Soil moisture from sensor {self.sensor_id}")
+        temperature_fig = px.line(temperature_df, x="time",
+                                  y="temperature",
+                                  title=f"Temperature from sensor {self.sensor_id}")
+        humidity_fig = px.line(humidity_df, x="time",
+                               y="humidity",
+                               title=f"Humidity from sensor {self.sensor_id}")
+        moisture_fig = px.line(moisture_df,
+                               x="time",
+                               y="moisture",
+                               title=f"Soil moisture from sensor {self.sensor_id}")
 
-        temperatureJSON = json.dumps(temperature_fig, cls=plotly.utils.PlotlyJSONEncoder)
-        humidityJSON = json.dumps(humidity_fig, cls=plotly.utils.PlotlyJSONEncoder)
-        moistureJSON = json.dumps(moisture_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        temperatureJSON = json.dumps(temperature_fig,
+                                     cls=plotly.utils.PlotlyJSONEncoder)
+        humidityJSON = json.dumps(humidity_fig,
+                                  cls=plotly.utils.PlotlyJSONEncoder)
+        moistureJSON = json.dumps(moisture_fig,
+                                  cls=plotly.utils.PlotlyJSONEncoder)
         
         return temperatureJSON, humidityJSON, moistureJSON
