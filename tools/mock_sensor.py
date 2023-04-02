@@ -21,9 +21,10 @@ def mock_sensor(body):
     return wrapper
 
 @mock_sensor
-def generate_dataframe():
+def generate_dataframe(sensor_id = None):
     print("dataframe generated")
-    return json.dumps({"sensor_id": random.randint(3,9),
+    sensor_id = random.randint(3,9) if sensor_id == None else sensor_id
+    return json.dumps({"sensor_id": sensor_id,
         "air_temperature": random_output(40,50,2),
         "air_humidity": random_output(20,25,2), 
         "soil_moisture": random_output(0,50,1),
@@ -33,5 +34,10 @@ def generate_dataframe():
 
 if __name__ == "__main__":
     while True:
-        generate_dataframe()
-        time.sleep(1)
+        generate_dataframe(sensor_id="1")
+        generate_dataframe(sensor_id="2")
+        # generate_dataframe(sensor_id="North")
+        # generate_dataframe(sensor_id="South")
+        # generate_dataframe(sensor_id="Center")
+        # generate_dataframe(sensor_id="Outside")
+        time.sleep(10)

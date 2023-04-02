@@ -44,16 +44,40 @@ void setup()
   pinMode(led_2, OUTPUT);
 
   // stworzenie tasków wykonujących poszczególne funkcje
-  xTaskCreatePinnedToCore(wifiTaskCode, "wifi task", 10000, NULL, 2, &wifiTask, 0);
+  xTaskCreatePinnedToCore(wifiTaskCode,
+                          "wifi task"
+                          10000,
+                          NULL,
+                          2,
+                          &wifiTask, 
+                          0);
   delay(500);
 
-  xTaskCreatePinnedToCore(httpHandlerTask, "http_task", 5000, NULL, 1, &httpTask, 1);
+  xTaskCreatePinnedToCore(httpHandlerTask,
+                          "http_task",
+                          5000,
+                          NULL,
+                          1,
+                          &httpTask,
+                          1);
   delay(500);
 
-  xTaskCreatePinnedToCore(sensorDataCollector, "sensorDataCollector", 10000, NULL, 1, &sensorTask, 1);
+  xTaskCreatePinnedToCore(sensorDataCollector,
+                          "sensorDataCollector",
+                          10000,
+                          NULL,
+                          1,
+                          &sensorTask,
+                          1);
   delay(500);
 
-  xTaskCreatePinnedToCore(sensorOperator, "sensorOperator", 5000, NULL, 1, &sensorOperatorTask, 1);
+  xTaskCreatePinnedToCore(sensorOperator,
+                          "sensorOperator",
+                          5000,
+                          NULL,
+                          1,
+                          &sensorOperatorTask,
+                          1);
   delay(500);
 }
 #pragma endregion // SETUP
@@ -91,9 +115,6 @@ void wifiTaskCode(void *parameter)
 #pragma region HTTP
 void httpHandlerTask(void *parameter)
 {
-  Serial.print("http_handler task is running on core ");
-  Serial.println(xPortGetCoreID());
-
   for (;;)
   {
     digitalWrite(led_2, HIGH);
@@ -118,7 +139,6 @@ void httpHandlerTask(void *parameter)
 #pragma region SENSOR_OPERATOR
 void sensorOperator(void *parameter)
 {
-
   for (;;)
   {
     if (WiFi.status() == WL_CONNECTED)
@@ -171,7 +191,6 @@ void sensorDataCollector(void *parameter)
   StaticJsonDocument<1024> doc;
   StaticJsonDocument<256> docTime;
   for (;;)
-  
   {
     if (WiFi.status() == WL_CONNECTED)
     {dataFrame.clear();
