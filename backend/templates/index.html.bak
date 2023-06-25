@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+<title>DASHBOARD</title>
+<link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+<meta http-equiv="refresh" content="60"> 
+</head>
+<body>
+<h2>DASHBOARD <span id="dash-board"></span></h2>
+<div class = "activeSensor"><br>
+<form action = "/redirecting" method="POST">
+<button type="submit" name="button" value="1">SENSOR 1</button>
+</form>
+<br><h2>Time of last record 01-04-2023 22:11:31</h2><h2>Air temperature: 48.98*C</h2>
+<h2>Air humidity: 22.79%</h2>
+<h2>Soil humidity: 43.90%</h2>
+</div>
+<div class = "activeSensor"><br>
+<form action = "/redirecting" method="POST">
+<button type="submit" name="button" value="2">SENSOR 2</button>
+</form>
+<br><h2>Time of last record 01-04-2023 22:11:31</h2><h2>Air temperature: 42.37*C</h2>
+<h2>Air humidity: 21.36%</h2>
+<h2>Soil humidity: 43.10%</h2>
+</div>
+</body>
+</html>

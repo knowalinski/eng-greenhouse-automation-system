@@ -34,10 +34,10 @@ def generate_dataframe(sensor_id = None):
 
 if __name__ == "__main__":
     while True:
-        generate_dataframe(sensor_id="1")
-        generate_dataframe(sensor_id="2")
-        # generate_dataframe(sensor_id="North")
-        # generate_dataframe(sensor_id="South")
-        # generate_dataframe(sensor_id="Center")
-        # generate_dataframe(sensor_id="Outside")
+        generate_dataframe(sensor_id="East")
+        generate_dataframe(sensor_id="West")
+        generate_dataframe(sensor_id="North")
+        generate_dataframe(sensor_id="South")
+        generate_dataframe(sensor_id="Center")
+        generate_dataframe(sensor_id="Outside")
         time.sleep(10)
